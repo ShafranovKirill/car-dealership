@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Client {
+  id    String  @id @default(uuid())
+  phone String  @unique
+  name  String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("clients")
+}
+
+model Staff {
+  id           String  @id @default(uuid())
+  login        String  @unique
+  passwordHash String  @map("password_hash")
+  name         String?
+
+  branches StaffBranch[]
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("staffs")
+}
+
+model StaffBranch {
+  staffId  String @map("staff_id")
+  branchId String @map("branch_id")
+
+  staff  Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@id([staffId, branchId])
+  @@map("staff_branches")
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  permissions Permission[] @map("permissions")
+
+  staffs Staff[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("roles")
+}
+
+model Branch {
+  id          String    @id @default(uuid())
+  alias       String    @unique
+  name        String
+  address     String?
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  categories Category[]
+  products   Product[]
+
+  @@map("branches")
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  order Int
+
+  branch   Branch    @relation(fields: [branchId], references: [id])
+  branchId String    @map("branch_id")
+  products Product[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("categories")
+}
+
+model Product {
+  id          String  @id @default(uuid())
+  name        String
+  price       Int
+  isActive    Boolean @default(true)
+  description String?
+  photos      Json?   @map("photos")
+
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId String @map("branch_id")
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @map("category_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("product")
+}
+
+model OutboxMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  type      String
+  payload   Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("outbox_messages")
+}
+
+model AuthMessage {
+  id     String       @id @default(uuid())
+  target String
+  code   String
+  callId String?      @map("call_id")
+  type   SendCodeType
+
+  status AuthStatus @default(PENDING)
+
+  ipAddress   String? @map("ip_address")
+  requestHash String? @map("request_hash")
+
+  attemptsCount Int @default(0) @map("attempts_count")
+  resendCount   Int @default(0) @map("resend_count")
+
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@index([target])
+  @@map("auth_message")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  sessionId String?    @unique @map("session_id")
+  clientId  String?    @unique @map("client_id")
+  staffId   String?    @unique @map("staff_id")
+  branchId  String     @map("branch_id")
+  items     CartItem[]
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@unique([clientId, branchId])
+  @@unique([sessionId, branchId])
+  @@unique([staffId, branchId])
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  cartId    String @map("cart_id")
+  productId String @map("product_id")
+  quantity  Int
+  cart      Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model MediaFile {
+  id           String @id @default(uuid())
+  bucket       String
+  key          String
+  originalName String @map("original_name")
+  mimeType     String @map("mime_type")
+  size         Int
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([mimeType])
+  @@map("media_files")
+}
+
+model Order {
+  id          String @id @default(uuid())
+  orderNumber Int    @unique @default(autoincrement()) @map("order_number")
+
+  branchId    String @map("branch_id")
+
+  clientId String? @map("client_id")
+  staffId  String? @map("staff_id")
+
+  status       OrderStatus  @default(PENDING)
+  deliveryType DeliveryType @map("delivery_type")
+
+  totalPrice    Int @map("total_price")
+  deliveryPrice Int @default(0) @map("delivery_price")
+
+  address String?
+  comment String?
+  phone   String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id      String @id @default(uuid())
+  orderId String @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String @map("product_id")
+
+  title    String
+  price    Int
+  quantity Int
+
+  modifiers Json?
+
+  @@unique([orderId, productId])
+  @@map("order_items")
+}
+
+enum DeliveryType {
+  DELIVERY
+  PICKUP
+  DINE_IN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  READY
+  PICKED_UP
+  COMPLETED
+  CANCELLED
+}
+
+enum AuthStatus {
+  PENDING
+  VERIFIED
+  EXPIRED
+  FAILED
+}
+
+enum Permission {
+  ADMIN
+  //Работник
+  STAFF_CREATE
+  STAFF_READ
+  STAFF_UPDATE
+  STAFF_DELETE
+  //Клиент
+  CLIENT_CREATE
+  CLIENT_READ
+  CLIENT_UPDATE
+  CLIENT_DELETE
+  //Роль
+  ROLE_CREATE
+  ROLE_READ
+  ROLE_UPDATE
+  ROLE_DELETE
+  //Продукт
+  PRODUCT_CREATE
+  PRODUCT_READ
+  PRODUCT_UPDATE
+  PRODUCT_DELETE
+  //Категория
+  CATEGORY_CREATE
+  CATEGORY_READ
+  CATEGORY_UPDATE
+  CATEGORY_DELETE
+  //Филиал
+  BRANCH_CREATE
+  BRANCH_READ
+  BRANCH_UPDATE
+  BRANCH_DELETE
+  //Заказ
+  ORDER_CREATE
+  ORDER_READ
+  ORDER_UPDATE
+  ORDER_DELETE
+}
+
+enum SendCodeType {
+  ZVONOK
+}
