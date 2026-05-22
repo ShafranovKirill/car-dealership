@@ -1,5 +1,5 @@
 {
-  "name": "delivest-web",
+  "name": "car-web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "@delivest/common": "workspace:*",
-    "@delivest/types": "workspace:*",
+    "@car/common": "workspace:*",
+    "@car/types": "workspace:*",
     "pinia": "^3.0.4",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"

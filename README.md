@@ -1,6 +1,6 @@
-# Delivest
+# Car
 
-Delivest is a modern food ordering and delivery service with a CRM system built on the pnpm monorepo. The product is currently in development.
+Car is a modern car dealership management system with a CRM system built on the pnpm monorepo. The product is currently in development.
 
 > **Work in progress.** Most of the system is not production-ready yet.
 
@@ -12,7 +12,7 @@ NestJS, Prisma, PostgreSQL, JWT, Argon2, MinIO, Full test setup with Jest and Te
 
 ### Frontend
 
-Vue
+Vue 3, Pinia, Vue Router, Vite, TypeScript, Tailwind CSS
 
 ### Monorepo
 
@@ -20,8 +20,8 @@ Pnpm workspace
 
 ### Applications:
 
-- apps/delivest-api
-- apps/delivest-web
+- apps/car-api
+- apps/car-web
 
 ## Development
 

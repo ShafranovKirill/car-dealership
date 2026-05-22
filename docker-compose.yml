@@ -3,7 +3,7 @@ version: "3.8"
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: delivest-postgres
+    container_name: car-postgres
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -14,11 +14,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - delivest-network
+      - car-network
 
   minio:
     image: minio/minio:latest
-    container_name: delivest-minio
+    container_name: car-minio
     command: server --console-address ":9001" /data/
     ports:
       - "${STORAGE_PORT}:9000"
@@ -29,11 +29,11 @@ services:
     volumes:
       - minio-storage:/data
     networks:
-      - delivest-network
+      - car-network
 
   redis:
     image: redis:alpine
-    container_name: delivest-redis
+    container_name: car-redis
     restart: always
     command: redis-server --appendonly yes
     ports:
@@ -41,23 +41,23 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - delivest-network
+      - car-network
 
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: delivest-redis-commander
+    container_name: car-redis-commander
     restart: unless-stopped
     ports:
       - "8081:8081"
     environment:
-      - REDIS_HOSTS=local:delivest-redis:6379:0
+      - REDIS_HOSTS=local:car-redis:6379:0
     depends_on:
       - redis
     networks:
-      - delivest-network
+      - car-network
 
 networks:
-  delivest-network:
+  car-network:
     driver: bridge
 
 volumes:

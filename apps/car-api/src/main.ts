@@ -29,7 +29,7 @@ async function bootstrap() {
   app.useGlobalFilters(new DomainExceptionFilter(), new ApiExceptionFilter());
 
   const config = new DocumentBuilder()
-    .setTitle('Delivest API')
+    .setTitle('Car API')
     .setDescription('API for client app')
     .setVersion('1.0')
     .addBearerAuth(

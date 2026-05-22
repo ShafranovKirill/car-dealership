@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@prisma-generated/*": ["../../apps/delivest-api/generated/*"]
+      "@prisma-generated/*": ["../../apps/car-api/generated/*"]
     }
   },
   "include": ["src/**/*"],

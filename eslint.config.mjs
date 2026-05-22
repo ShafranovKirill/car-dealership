@@ -7,8 +7,8 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/node_modules/**",
-      "apps/delivest-api/**",
-      "apps/delivest-web/**",
+      "apps/car-api/**",
+      "apps/car-web/**",
       "**/*.config.mjs",
       "**/*.config.js",
     ],

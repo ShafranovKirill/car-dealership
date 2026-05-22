@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@delivest/types": ["libs/types"]
+      "@car/types": ["libs/types"]
     }
   }
 }
