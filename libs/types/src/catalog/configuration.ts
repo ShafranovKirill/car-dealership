@@ -1,0 +1,36 @@
+import { CarModelResponse } from "./model.js";
+import { PhotoKey } from "@common/photo-keys.js";
+
+export interface ConfigurationResponse {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  carModelId: string;
+  images: Record<PhotoKey, string>;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface ConfigurationFullResponse extends ConfigurationResponse {
+  carModel?: CarModelResponse;
+}
+
+export interface FindConfigurationRequest {
+  id: string;
+}
+
+export interface FindConfigurationByModelRequest {
+  carModelId: string;
+}
+
+export interface CreateConfigurationRequest {
+  name: string;
+  price: number;
+  description: string;
+  carModelId: string;
+}
+
+export type UpdateConfigurationRequest = Partial<Omit<CreateConfigurationRequest, "carModelId">> & {
+  configurationId: string;
+};
