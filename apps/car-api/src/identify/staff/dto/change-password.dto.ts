@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PASSWORD_REGEX } from '@delivest/common';
-import { ChangePasswordStaffRequest } from '@delivest/types';
+import { PASSWORD_REGEX } from '@car/common';
+import { ChangePasswordStaffRequest } from '@car/types';
 import { IsString, MinLength, Matches } from 'class-validator';
 
 export class ChangePasswordDto implements ChangePasswordStaffRequest {

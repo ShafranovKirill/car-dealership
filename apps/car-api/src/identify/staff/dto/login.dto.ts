@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PASSWORD_REGEX } from '@delivest/common';
+import { PASSWORD_REGEX } from '@car/common';
 import { IsString, Matches } from 'class-validator';
-import { LoginStaffRequest } from '@delivest/types';
+import { LoginStaffRequest } from '@car/types';
 
 export class LoginStaffDto implements LoginStaffRequest {
   @ApiProperty({

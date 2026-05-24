@@ -1,61 +1,19 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import * as argon2 from 'argon2';
-import { Permission } from '../../generated/prisma/enums.js';
-import { CreateClientDto } from './client/dto/create.dto.js';
-import { ClientService } from './client/client.service.js';
-import { AccessStaffTokenPayload } from '@delivest/types';
-import { BranchAbilityService } from './staff/branch-ability.service.js';
 
 @Injectable()
 export class IdentityService implements OnApplicationBootstrap {
   private readonly logger = new Logger(IdentityService.name);
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly clientService: ClientService,
-    private readonly branchAbilityService: BranchAbilityService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async createProfileIfNotExist(dto: CreateClientDto) {
-    return await this.clientService.create(dto);
-  }
   async onApplicationBootstrap() {
     await this.seedAdmin();
   }
 
-  checkBranchAbility(staffToken: AccessStaffTokenPayload, branchId: string) {
-    return this.branchAbilityService.hasAccess(staffToken, branchId);
-  }
-
-  applyBranchAbility<T>(
-    staffToken: AccessStaffTokenPayload,
-    requestedBranchId?: string | string[],
-  ): T {
-    return this.branchAbilityService.applyBranchPolicy<T>(
-      staffToken,
-      requestedBranchId,
-    );
-  }
-
   private async seedAdmin() {
     try {
-      let adminRole = await this.prisma.role.findFirst({
-        where: { name: 'ADMIN' },
-      });
-
-      if (!adminRole) {
-        this.logger.log('Admin role not found. Creating...');
-        adminRole = await this.prisma.role.create({
-          data: {
-            name: 'ADMIN',
-            permissions: [Permission.ADMIN],
-          },
-        });
-      }
-
-      const adminExists = await this.prisma.staff.findFirst({
-        where: { roleId: adminRole.id },
-      });
+      const adminExists = await this.prisma.staff.findFirst();
 
       if (!adminExists) {
         this.logger.log('No admin user found. Creating default admin...');
@@ -67,7 +25,6 @@ export class IdentityService implements OnApplicationBootstrap {
           data: {
             login: defaultLogin,
             passwordHash: passwordHash,
-            roleId: adminRole.id,
           },
         });
 

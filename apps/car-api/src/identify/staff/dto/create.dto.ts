@@ -1,5 +1,5 @@
-import { PASSWORD_REGEX } from '@delivest/common';
-import { CreateStaffRequest } from '@delivest/types';
+import { PASSWORD_REGEX } from '@car/common';
+import { CreateStaffRequest } from '@car/types';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsString, Matches } from 'class-validator';
 

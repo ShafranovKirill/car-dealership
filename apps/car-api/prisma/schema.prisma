@@ -6,17 +6,127 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+model Brand {
+  id        String     @id @default(uuid())
+  name      String     @unique // Название марки (например, BMW, Audi)
+  logo      String     // Ссылка на фото/логотип марки
+  
+  carModels CarModel[]
 
-model Client {
-  id    String  @id @default(uuid())
-  phone String  @unique
-  name  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  @@map("brands")
+}
 
-  @@map("clients")
+model CarModel {
+  id             String           @id @default(uuid())
+  modelName      String           // Модель (например, X5)
+  generation     String           // Поколение (например, G05)
+  yearFrom       Int              // Год начала производства поколения
+  yearTo         Int?             // Год окончания (null, если выпускается сейчас)
+  bodyType       BodyType
+  carClass       CarClass
+  images         Json             
+  
+  transmission   TransmissionType 
+  drive          DriveType        
+
+  brandId        String
+  brand          Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  engineId       String
+  engine         Engine           @relation(fields: [engineId], references: [id], onDelete: Restrict)
+  
+  dimensions     Dimensions?      
+  configurations Configuration[]  
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@map("car_models")
+}
+
+model Dimensions {
+  id             String   @id @default(uuid())
+  length         Int      // Длина в мм
+  width          Int      // Ширина в мм
+  height         Int      // Высота в мм
+  wheelbase      Int      // Колесная база в мм
+  clearance      Int      // Клиренс (дорожный просвет) в мм
+  trunkVolume    Int      // Объем багажника в литрах (минимальный)
+  trunkMaxVolume Int?     // Объем багажника при сложенных сиденьях (опционально)
+
+  carModelId     String   @unique
+  carModel       CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade)
+
+  @@map("dimensions")
+}
+
+model Engine {
+  id             String          @id @default(uuid())
+  name           String          // Код/название двигателя (например, EA888, B58)
+  type           EngineType      // Тип топлива / питания
+  volume         Float           // Объем в литрах (например, 2.0). Для электро можно ставить 0
+  power          Int             // Мощность в л.с.
+  torque         Int             // Крутящий момент в Нм
+  cylinderCount  Int?            // Количество цилиндров (опционально для электро)
+
+  carModels      CarModel[]      // Теперь один двигатель может стоять на разных моделях машин
+
+  @@map("engines")
+}
+
+model Configuration {
+  id             String           @id @default(uuid())
+  name           String           // Название комплектации (например, "Comfort", "M Sport")
+  price          Int              // Цена в копейках или целых единицах валюты
+
+  carModelId     String
+  carModel       CarModel         @relation(fields: [carModelId], references: [id], onDelete: Cascade)
+  
+  customFeatures ConfigurationCustomFeature[]
+
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@map("configurations")
+}
+
+model FeatureCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique // Название категории
+  order     Int      @default(0) 
+
+  featureKeys CustomFeatureKey[]
+
+  @@map("feature_categories")
+}
+
+model CustomFeatureKey {
+  id                String   @id @default(uuid())
+  name              String   @unique // Название характеристики (например, "Климат-контроль")
+  
+  categoryId        String
+  category          FeatureCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  configurations    ConfigurationCustomFeature[]
+
+  @@map("custom_feature_keys")
+}
+
+model ConfigurationCustomFeature {
+  id              String           @id @default(uuid())
+  
+  configurationId String
+  configuration   Configuration    @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  featureKeyId    String
+  featureKey      CustomFeatureKey @relation(fields: [featureKeyId], references: [id], onDelete: Cascade)
+
+  value           String          
+
+  @@unique([configurationId, featureKeyId]) 
+  @@map("configuration_custom_features")
 }
 
 model Staff {
@@ -25,152 +135,11 @@ model Staff {
   passwordHash String  @map("password_hash")
   name         String?
 
-  branches StaffBranch[]
-  roleId String @map("role_id")
-  role   Role   @relation(fields: [roleId], references: [id])
-
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
   @@map("staffs")
-}
-
-model StaffBranch {
-  staffId  String @map("staff_id")
-  branchId String @map("branch_id")
-
-  staff  Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
-
-  @@id([staffId, branchId])
-  @@map("staff_branches")
-}
-
-model Role {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  permissions Permission[] @map("permissions")
-
-  staffs Staff[]
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("roles")
-}
-
-model Branch {
-  id          String    @id @default(uuid())
-  alias       String    @unique
-  name        String
-  address     String?
-  description String?   @db.Text
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
-
-  categories Category[]
-  products   Product[]
-
-  @@map("branches")
-}
-
-model Category {
-  id    String @id @default(uuid())
-  name  String
-  order Int
-
-  branch   Branch    @relation(fields: [branchId], references: [id])
-  branchId String    @map("branch_id")
-  products Product[]
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("categories")
-}
-
-model Product {
-  id          String  @id @default(uuid())
-  name        String
-  price       Int
-  isActive    Boolean @default(true)
-  description String?
-  photos      Json?   @map("photos")
-
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  branchId String @map("branch_id")
-
-  category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId String?   @map("category_id")
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("product")
-}
-
-model OutboxMessage {
-  id        String   @id @default(uuid()) @db.Uuid
-  type      String
-  payload   Json
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([createdAt])
-  @@map("outbox_messages")
-}
-
-model AuthMessage {
-  id     String       @id @default(uuid())
-  target String
-  code   String
-  callId String?      @map("call_id")
-  type   SendCodeType
-
-  status AuthStatus @default(PENDING)
-
-  ipAddress   String? @map("ip_address")
-  requestHash String? @map("request_hash")
-
-  attemptsCount Int @default(0) @map("attempts_count")
-  resendCount   Int @default(0) @map("resend_count")
-
-  expiresAt DateTime? @map("expires_at")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-
-  @@index([target])
-  @@map("auth_message")
-}
-
-model Cart {
-  id        String     @id @default(uuid())
-  sessionId String?    @unique @map("session_id")
-  clientId  String?    @unique @map("client_id")
-  staffId   String?    @unique @map("staff_id")
-  branchId  String     @map("branch_id")
-  items     CartItem[]
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-
-  @@unique([clientId, branchId])
-  @@unique([sessionId, branchId])
-  @@unique([staffId, branchId])
-  @@map("carts")
-}
-
-model CartItem {
-  id        String @id @default(uuid())
-  cartId    String @map("cart_id")
-  productId String @map("product_id")
-  quantity  Int
-  cart      Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
-
-  @@unique([cartId, productId])
-  @@map("cart_items")
 }
 
 model MediaFile {
@@ -188,112 +157,44 @@ model MediaFile {
   @@map("media_files")
 }
 
-model Order {
-  id          String @id @default(uuid())
-  orderNumber Int    @unique @default(autoincrement()) @map("order_number")
-
-  branchId    String @map("branch_id")
-
-  clientId String? @map("client_id")
-  staffId  String? @map("staff_id")
-
-  status       OrderStatus  @default(PENDING)
-  deliveryType DeliveryType @map("delivery_type")
-
-  totalPrice    Int @map("total_price")
-  deliveryPrice Int @default(0) @map("delivery_price")
-
-  address String?
-  comment String?
-  phone   String?
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  items OrderItem[]
-
-  @@map("orders")
+enum BodyType {
+  SEDAN       // Седан
+  HATCHBACK   // Хэтчбек
+  SUV         // Внедорожник / Кроссовер
+  WAGON       // Универсал
+  COUPE       // Купе
+  MINIVAN     // Минивэн
+  PICKUP      // Пикап
 }
 
-model OrderItem {
-  id      String @id @default(uuid())
-  orderId String @map("order_id")
-  order   Order  @relation(fields: [orderId], references: [id])
-
-  productId String @map("product_id")
-
-  title    String
-  price    Int
-  quantity Int
-
-  modifiers Json?
-
-  @@unique([orderId, productId])
-  @@map("order_items")
+enum CarClass {
+  A // Особо малый (Smart Fortwo)
+  B // Малый (VW Polo, Kia Rio)
+  C // Малый средний (Toyota Corolla, VW Golf)
+  D // Средний (BMW 3, Passat)
+  E // Бизнес-класс (Audi A6, Mercedes E-class)
+  F // Представительский (BMW 7, Maybach)
+  J // Внедорожники и кроссоверы
+  M // Минивэны
+  S // Спортивные купе / суперкары
 }
 
-enum DeliveryType {
-  DELIVERY
-  PICKUP
-  DINE_IN
+enum EngineType {
+  BENZIN    // Бензиновый
+  DIESEL    // Дизельный
+  HYBRID    // Гибрид
+  ELECTRIC  // Электромотор
 }
 
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  READY
-  PICKED_UP
-  COMPLETED
-  CANCELLED
+enum TransmissionType {
+  MANUAL       // Механическая (МКПП)
+  AUTOMATIC    // Автоматическая (АКПП)
+  ROBOT        // Роботизированная (РКПП)
+  VARIATOR     // Вариатор (CVT)
 }
 
-enum AuthStatus {
-  PENDING
-  VERIFIED
-  EXPIRED
-  FAILED
-}
-
-enum Permission {
-  ADMIN
-  //Работник
-  STAFF_CREATE
-  STAFF_READ
-  STAFF_UPDATE
-  STAFF_DELETE
-  //Клиент
-  CLIENT_CREATE
-  CLIENT_READ
-  CLIENT_UPDATE
-  CLIENT_DELETE
-  //Роль
-  ROLE_CREATE
-  ROLE_READ
-  ROLE_UPDATE
-  ROLE_DELETE
-  //Продукт
-  PRODUCT_CREATE
-  PRODUCT_READ
-  PRODUCT_UPDATE
-  PRODUCT_DELETE
-  //Категория
-  CATEGORY_CREATE
-  CATEGORY_READ
-  CATEGORY_UPDATE
-  CATEGORY_DELETE
-  //Филиал
-  BRANCH_CREATE
-  BRANCH_READ
-  BRANCH_UPDATE
-  BRANCH_DELETE
-  //Заказ
-  ORDER_CREATE
-  ORDER_READ
-  ORDER_UPDATE
-  ORDER_DELETE
-}
-
-enum SendCodeType {
-  ZVONOK
+enum DriveType {
+  FWD // Передний привод
+  RWD // Задний привод
+  AWD // Полный привод
 }

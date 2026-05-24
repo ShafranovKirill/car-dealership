@@ -1,4 +1,4 @@
-import { ErrorCodes } from '@delivest/common';
+import { ErrorCodes } from '@car/common';
 import { HttpStatus } from '@nestjs/common';
 
 export class DomainException extends Error {

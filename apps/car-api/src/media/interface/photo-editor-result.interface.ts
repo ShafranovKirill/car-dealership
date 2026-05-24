@@ -1,4 +1,4 @@
-import { PhotoKey } from '@delivest/common';
+import { PhotoKey } from '@car/common';
 
 export interface ChildResult {
   key: PhotoKey;

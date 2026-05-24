@@ -1,5 +1,3 @@
-import { Permission } from "@prisma-generated/prisma/enums.js";
-
 export interface RefreshStaffTokenPayload {
   sub: string;
   login: string;
@@ -7,11 +5,7 @@ export interface RefreshStaffTokenPayload {
   exp?: number;
 }
 
-export interface AccessStaffTokenPayload extends RefreshStaffTokenPayload {
-  roleId: string;
-  permissions: Permission[];
-  branchIds?: string[];
-}
+export interface AccessStaffTokenPayload extends RefreshStaffTokenPayload {}
 
 export interface CreateStaffRequest {
   branchIds: string[];

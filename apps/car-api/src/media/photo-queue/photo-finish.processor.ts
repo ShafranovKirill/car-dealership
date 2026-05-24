@@ -4,8 +4,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ParentPhotoQueuePayload } from '../interface/photo-payload.interface.js';
 import { ChildResult } from '../interface/photo-editor-result.interface.js';
 import { Logger } from '@nestjs/common/services/index.js';
-import { PHOTO_KEYS } from '@delivest/common';
 import { PhotoConversionEvent, PhotoMap } from '../../shared/events/types.js';
+import { PHOTO_KEYS } from '@car/common';
 
 @Processor('photo-notifications')
 export class PhotoFinishProcessor extends WorkerHost {

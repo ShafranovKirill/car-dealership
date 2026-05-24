@@ -33,13 +33,10 @@ import { JwtStaffAuthGuard } from './guards/jwt-staff.guard.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { FindByLoginDto } from './dto/find-by-login.dto.js';
 import { CurrentStaff } from '../../shared/decorators/current-staff.decorator.js';
-import { AclGuard } from '../acl/guards/acl.guard.js';
-import { RequirePermission } from '../acl/decorators/require-permission.decorator.js';
-import { Permission } from '../../../generated/prisma/enums.js';
 import { GetStaffDto } from './dto/get-staff.dto.js';
 import { ReadStaffDto } from './dto/read.dto.js';
 import { UpdateStaffDto } from './dto/update.dto.js';
-import { COOKIE_NAMES } from '@delivest/common';
+import { COOKIE_NAMES } from '@car/common';
 
 @ApiTags('Staff (Работники)')
 @Controller('staff')
@@ -67,8 +64,7 @@ export class StaffController {
   @Post('create')
   @ApiBearerAuth('staff-auth')
   @ApiOperation({ summary: 'Создать работника' })
-  @UseGuards(JwtStaffAuthGuard, AclGuard)
-  @RequirePermission(Permission.STAFF_CREATE)
+  @UseGuards(JwtStaffAuthGuard)
   async register(@Body() dto: CreateStaffDto): Promise<ReadStaffDto> {
     return await this.service.create(dto);
   }
@@ -76,8 +72,7 @@ export class StaffController {
   @Patch('update')
   @ApiBearerAuth('staff-auth')
   @ApiOperation({ summary: 'Обновить данные работника' })
-  @UseGuards(JwtStaffAuthGuard, AclGuard)
-  @RequirePermission(Permission.STAFF_UPDATE)
+  @UseGuards(JwtStaffAuthGuard)
   async update(@Body() dto: UpdateStaffDto): Promise<ReadStaffDto> {
     return await this.service.update(dto);
   }
@@ -85,8 +80,7 @@ export class StaffController {
   @Delete('delete/:id')
   @ApiBearerAuth('staff-auth')
   @ApiOperation({ summary: 'Удалить работника' })
-  @UseGuards(JwtStaffAuthGuard, AclGuard)
-  @RequirePermission(Permission.STAFF_DELETE)
+  @UseGuards(JwtStaffAuthGuard)
   async softDelete(@Param('id') id: string) {
     return await this.service.softDelete(id);
   }
@@ -131,8 +125,7 @@ export class StaffController {
   @Get('find-by-login/:login')
   @ApiBearerAuth('staff-auth')
   @ApiOperation({ summary: 'Найти работника по логину' })
-  @UseGuards(JwtStaffAuthGuard, AclGuard)
-  @RequirePermission(Permission.STAFF_READ)
+  @UseGuards(JwtStaffAuthGuard)
   async findByLogin(@Param() dto: FindByLoginDto): Promise<ReadStaffDto> {
     return await this.service.findOneByLogin(dto.login);
   }
@@ -140,8 +133,7 @@ export class StaffController {
   @Get('all')
   @ApiBearerAuth('staff-auth')
   @ApiOperation({ summary: 'Получить список всех работников' })
-  @UseGuards(JwtStaffAuthGuard, AclGuard)
-  @RequirePermission(Permission.STAFF_READ)
+  @UseGuards(JwtStaffAuthGuard)
   async findAll(): Promise<ReadStaffDto[]> {
     return await this.service.findAll();
   }
@@ -149,8 +141,7 @@ export class StaffController {
   @Get(':id')
   @ApiBearerAuth('staff-auth')
   @ApiOperation({ summary: 'Получить данные работника по айди' })
-  @UseGuards(JwtStaffAuthGuard, AclGuard)
-  @RequirePermission(Permission.STAFF_READ)
+  @UseGuards(JwtStaffAuthGuard)
   async findOne(@Param() dto: GetStaffDto): Promise<ReadStaffDto> {
     return this.service.findOne(dto.id);
   }

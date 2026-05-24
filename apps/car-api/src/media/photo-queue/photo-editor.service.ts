@@ -8,7 +8,7 @@ import { MediaService } from '../media.service.js';
 import { FileUploadFailedException } from '../../shared/exceptions/domain_exception/domain-exception.js';
 import { UploadFile } from '../interface/upload-file.interface.js';
 import { PhotoProfile } from '../photo-configs/profiles.js';
-import { PhotoKey } from '@delivest/common';
+import { PhotoKey } from '@car/common';
 import { DelivestEvent } from '../../shared/events/types.js';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { COOKIE_NAMES } from '@delivest/common';
+import { COOKIE_NAMES } from '@car/common';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';

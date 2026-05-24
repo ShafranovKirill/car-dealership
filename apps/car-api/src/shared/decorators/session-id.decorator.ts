@@ -1,4 +1,4 @@
-import { COOKIE_NAMES } from '@delivest/common';
+import { COOKIE_NAMES } from '@car/common';
 import {
   createParamDecorator,
   ExecutionContext,

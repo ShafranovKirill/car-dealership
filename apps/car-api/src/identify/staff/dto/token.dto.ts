@@ -1,4 +1,4 @@
-import { TokenStaffResponse } from '@delivest/types';
+import { TokenStaffResponse } from '@car/types';
 
 export class TokenStaffResponseDto implements TokenStaffResponse {
   accessToken!: string;

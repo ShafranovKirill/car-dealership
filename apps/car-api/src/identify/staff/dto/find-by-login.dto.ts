@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { FindByLoginRequest } from '@delivest/types';
+import { FindByLoginRequest } from '@car/types';
 import { IsString } from 'class-validator';
 
 export class FindByLoginDto implements FindByLoginRequest {

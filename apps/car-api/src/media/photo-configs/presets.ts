@@ -1,4 +1,4 @@
-import { PHOTO_KEYS } from '@delivest/common';
+import { PHOTO_KEYS } from '@car/common';
 import { PHOTO_PROFILES } from './profiles.js';
 
 export const PRODUCT_PHOTO_PRESETS = [

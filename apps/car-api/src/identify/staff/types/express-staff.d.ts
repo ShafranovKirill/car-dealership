@@ -1,4 +1,4 @@
-import { AccessStaffTokenPayload } from '@delivest/types';
+import { AccessStaffTokenPayload } from '@car/types';
 
 declare global {
   namespace Express {

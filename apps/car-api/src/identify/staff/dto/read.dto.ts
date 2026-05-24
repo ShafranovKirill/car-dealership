@@ -1,4 +1,4 @@
-import { StaffResponse } from '@delivest/types';
+import { StaffResponse } from '@car/types';
 import { Expose } from 'class-transformer';
 
 export class ReadStaffDto implements StaffResponse {

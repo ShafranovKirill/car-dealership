@@ -23,12 +23,8 @@ import {
   getPrismaModelName,
   isPrismaError,
 } from '../../shared/helpers/db-errors.js';
-import { COOKIE_NAMES, PrismaErrorCode } from '@delivest/common';
-import {
-  AccessStaffTokenPayload,
-  RefreshStaffTokenPayload,
-} from '@delivest/types';
-import { RoleService } from '../acl/role.service.js';
+import { COOKIE_NAMES, PrismaErrorCode } from '@car/common';
+import { AccessStaffTokenPayload, RefreshStaffTokenPayload } from '@car/types';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { LoginStaffDto } from './dto/login.dto.js';
 import { Response } from 'express';
@@ -46,7 +42,6 @@ export class StaffService {
     private readonly config: ConfigService,
     private readonly jwt: JwtService,
     private readonly prisma: PrismaService,
-    private readonly roleService: RoleService,
   ) {
     this.accessTtl = +this.config.get<number>(
       'JWT_ACCESS_TTL_SECONDS_STAFF',
@@ -137,15 +132,8 @@ export class StaffService {
         data: {
           login: dto.login,
           passwordHash: passwordHash,
-          roleId: dto.roleId,
           name: dto.name,
-          branches: {
-            createMany: {
-              data: dto.branchIds.map((id) => ({ branchId: id })),
-            },
-          },
         },
-        include: { branches: true },
       });
 
       this.logger.log(`create() | Staff id=${staff.id} is created`);
@@ -175,9 +163,6 @@ export class StaffService {
               },
             },
           }),
-        },
-        include: {
-          branches: true,
         },
       });
 
@@ -285,14 +270,9 @@ export class StaffService {
   }
 
   async generateAccessToken(staff: Staff): Promise<string> {
-    const role = await this.roleService.findById(staff.roleId);
-    const branchIds = await this.getStaffsBranches(staff.id);
     const payload: AccessStaffTokenPayload = {
       login: staff.login,
       sub: staff.id,
-      roleId: staff.roleId,
-      permissions: role.permissions,
-      branchIds,
     };
 
     return this.jwt.signAsync(payload, {
@@ -322,14 +302,6 @@ export class StaffService {
       path: '/',
       maxAge: refreshMaxAge,
     });
-  }
-
-  private async getStaffsBranches(staffId: string): Promise<string[]> {
-    const staffBranches = await this.prisma.staffBranch.findMany({
-      where: { staffId: staffId },
-      select: { branchId: true },
-    });
-    return staffBranches.map((sb) => sb.branchId);
   }
 
   private handleAccountConstraintError(error: unknown): never {

@@ -1,4 +1,4 @@
-import { PhotoKey } from '@delivest/common';
+import { PhotoKey } from '@car/common';
 import { DelivestEvent } from '../../shared/events/types.js';
 import { PhotoProfile } from '../photo-configs/profiles.js';
 

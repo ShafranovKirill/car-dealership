@@ -1,4 +1,4 @@
-import { UpdateStaffRequest } from '@delivest/types';
+import { UpdateStaffRequest } from '@car/types';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsOptional, IsString } from 'class-validator';
 

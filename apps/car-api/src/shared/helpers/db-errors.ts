@@ -1,5 +1,5 @@
 import { Prisma } from '../../../generated/prisma/client.js';
-import { PrismaErrorCode } from '@delivest/common';
+import { PrismaErrorCode } from '@car/common';
 
 export interface PrismaErrorMeta extends Record<string, any> {
   modelName?: string;
@@ -24,6 +24,7 @@ export function isConstraintError(error: unknown): boolean {
     PrismaErrorCode.FOREIGN_KEY_VIOLATION,
     PrismaErrorCode.NOT_NULL_VIOLATION,
     PrismaErrorCode.REQUIRED_RELATION_VIOLATION,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   ].includes(code as any);
 }
 
@@ -34,5 +35,5 @@ export function getInternalErrorCode(error: unknown): string | undefined {
 
 export function getPrismaModelName(error: unknown): string | undefined {
   if (!isPrismaError(error)) return undefined;
-  return (error.meta as PrismaErrorMeta | undefined)?.modelName;
+  return error.meta?.modelName as string | undefined;
 }
