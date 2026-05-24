@@ -1,7 +1,7 @@
 import { CarModelFullResponse } from '@car/types';
 import { CarModelResponseDto } from './read-model.dto.js';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose, Type } from 'class-transformer/types/decorators/index.js';
+import { Expose, Type } from 'class-transformer';
 import { CarTechnicalInfoResponseDto } from './read-info.dto.js';
 import { ReadConfigurationDto } from '../../configuration/dto/read.dto.js';
 

@@ -36,7 +36,7 @@ model CarModel {
 
   technicalInfo CarTechnicalInfo?           // Технические характеристики автомобиля
   
-  configuration Configuration?              // Комплектация автомобиля
+  configurations Configuration[]              // Комплектация автомобиля
 
   createdAt DateTime @default(now()) @map("created_at") // Дата добавления записи в базу
   updatedAt DateTime @updatedAt @map("updated_at")        // Дата последнего обновления записи
@@ -64,8 +64,6 @@ model CarTechnicalInfo {
   transmission   TransmissionType                         // Тип коробки передач (автомат, механика, робот)
   driveType      DriveType        @map("drive_type")      // Тип привода (передний, задний, полный)
 
-  engineId String @map("engine_id")           // ID двигателя/маркировка мотора
-
   carModelId String   @unique @map("car_model_id") // ID автомобиля, к которому относятся характеристики
   carModel   CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade) // Связь с таблицей моделей
 
@@ -76,7 +74,7 @@ model Configuration {
   name        String 
   price       Int 
   description String
-  images      Json
+  images      Json?
 
 
   carModelId String   @unique @map("car_model_id")

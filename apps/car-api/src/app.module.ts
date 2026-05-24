@@ -12,6 +12,7 @@ import { RedisModule } from './redis/redis.module.js';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigurationModule } from './catalog/configuration/configuration.module.js';
 import { BrandModule } from './catalog/brand/brand.module.js';
+import { ModelModule } from './catalog/model/model.module.js';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BrandModule } from './catalog/brand/brand.module.js';
     RedisModule,
     ConfigurationModule,
     BrandModule,
+    ModelModule,
     ClsModule.forRoot({
       global: true,
       middleware: { mount: true },

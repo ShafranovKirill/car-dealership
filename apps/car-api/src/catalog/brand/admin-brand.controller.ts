@@ -26,8 +26,8 @@ import { UpdateBrandDto } from './dto/update.dto.js';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/index.js';
 import { BadRequestException } from '../../shared/exceptions/domain_exception/domain-exception.js';
 
-@ApiTags('Admin-model (Производители машин - админ)')
-@Controller('admin/model')
+@ApiTags('Admin-brand (Производители машин - админ)')
+@Controller('admin/brand')
 @ApiBearerAuth('staff-auth')
 @UseGuards(JwtStaffAuthGuard)
 export class AdminBrandController {
