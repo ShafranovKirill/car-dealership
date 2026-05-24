@@ -38,29 +38,11 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description:
-          'Client JWT token (from /client/login or /client/register)',
-        in: 'header',
-      },
-      'client-auth',
-    )
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
         description: 'Staff JWT token (from /staff/login)',
         in: 'header',
       },
       'staff-auth',
     )
-    .addCookieAuth('client_refresh_token', {
-      type: 'apiKey',
-      in: 'cookie',
-      name: 'client_refresh_token',
-      description: 'Refresh token for Clients',
-    })
     .addCookieAuth('staff_refresh_token', {
       type: 'apiKey',
       in: 'cookie',

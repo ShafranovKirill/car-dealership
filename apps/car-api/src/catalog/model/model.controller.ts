@@ -1,17 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiNotFoundResponse,
-  ApiParam,
-} from '@nestjs/swagger';
-import { ProductService } from './product.service.js';
-import { ReadProductDto } from './dto/read-model.dto.js';
-import { GetProductDto } from './dto/find.dto.js';
-import { FindProductsByNameDto } from './dto/find-by-name.dto.js';
-import { GetProductsByBranchDto } from './dto/find-by-branch.dto.js';
-import { GetProductsByCategoryDto } from './dto/find-by-category.dto.js';
+import { Controller } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ModelService } from './model.service.js';
 
 @ApiTags('Model (Модели машин)')

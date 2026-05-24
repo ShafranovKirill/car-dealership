@@ -7,6 +7,7 @@ import { IdentityModule } from '../../identify/identify.module.js';
 import { BrandController } from './brand.controller.js';
 import { AdminBrandController } from './admin-brand.controller.js';
 import { BrandService } from './brand.service.js';
+import { NotificationModule } from '../../notification/notification.module.js';
 @Module({
   imports: [
     PrismaModule,
@@ -14,6 +15,7 @@ import { BrandService } from './brand.service.js';
     PhotoQueueModule,
     MediaModule,
     IdentityModule,
+    NotificationModule,
   ],
   controllers: [BrandController, AdminBrandController],
   providers: [BrandService],

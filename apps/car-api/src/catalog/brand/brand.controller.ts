@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BrandService } from './brand.service.js';
 import { ReadBrandDto } from './dto/read.dto.js';
 
-@ApiTags('Brand (Марки машин)')
+@ApiTags('Brand (Производители машин)')
 @Controller('brand')
 export class BrandController {
   constructor(private readonly service: BrandService) {}
