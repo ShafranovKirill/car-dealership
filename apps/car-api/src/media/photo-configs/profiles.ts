@@ -47,7 +47,36 @@ export interface PhotoProfile {
 }
 
 export const PHOTO_PROFILES = {
-  PRODUCT_CARD: {
+  PHOTO_XXS: {
+    format: PhotoConvertFormat.WEBP,
+    width: 100,
+    height: 100,
+    fit: 'cover' as const,
+    position: 'centre',
+    quality: 85,
+  },
+
+  PHOTO_XS: {
+    format: PhotoConvertFormat.WEBP,
+    width: 200,
+    height: 200,
+    fit: 'contain' as const,
+    position: 'centre',
+    quality: 90,
+    background: '#FFFFFF',
+  },
+
+  PHOTO_SM: {
+    format: PhotoConvertFormat.WEBP,
+    width: 400,
+    height: 320,
+    fit: 'contain' as const,
+    position: 'centre',
+    quality: 90,
+    background: '#FFFFFF',
+  },
+
+  PHOTO_MD: {
     format: PhotoConvertFormat.WEBP,
     width: 600,
     height: 480,
@@ -56,13 +85,14 @@ export const PHOTO_PROFILES = {
     quality: 90,
     background: '#FFFFFF',
   },
-  PRODUCT_PREVIEW: {
+
+  PHOTO_LG: {
     format: PhotoConvertFormat.WEBP,
-    width: 200,
-    height: 200,
+    width: 1200,
+    height: 960,
     fit: 'contain' as const,
     position: 'centre',
-    quality: 90,
+    quality: 85,
     background: '#FFFFFF',
   },
 } as const satisfies Record<string, PhotoProfile>;

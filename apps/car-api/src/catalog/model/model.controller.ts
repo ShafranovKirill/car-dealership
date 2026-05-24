@@ -7,7 +7,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { ProductService } from './product.service.js';
-import { ReadProductDto } from './dto/read.dto.js';
+import { ReadProductDto } from './dto/read-model.dto.js';
 import { GetProductDto } from './dto/find.dto.js';
 import { FindProductsByNameDto } from './dto/find-by-name.dto.js';
 import { GetProductsByBranchDto } from './dto/find-by-branch.dto.js';

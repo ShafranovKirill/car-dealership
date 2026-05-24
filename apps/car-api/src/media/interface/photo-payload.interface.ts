@@ -1,13 +1,13 @@
 import { PhotoKey } from '@car/common';
-import { DelivestEvent } from '../../shared/events/types.js';
+import { ProjectEvent } from '../../shared/events/types.js';
 import { PhotoProfile } from '../photo-configs/profiles.js';
 
 export interface ParentPhotoQueuePayload {
   targetId: string;
   socketId: string;
   originalFileKey: string;
-  succesEventType: DelivestEvent;
-  failEventType: DelivestEvent;
+  succesEventType: ProjectEvent;
+  failEventType: ProjectEvent;
 }
 
 export interface ChildPhotoQueuePayload {

@@ -41,14 +41,6 @@ export interface CreateCarTechnicalInfoRequest {
   driveType: DriveType;
 }
 
-export interface FindCarModelRequest {
-  id: string;
-}
-
-export interface FindCarModelsByBrandRequest {
-  brandId: string;
-}
-
 export interface CarModelResponse {
   id: string;
   name: string;
@@ -65,7 +57,6 @@ export interface CarModelResponse {
 }
 
 export interface CarModelFullResponse extends CarModelResponse {
-  brand?: BrandResponse;
   technicalInfo?: CarTechnicalInfoResponse | null;
   configurations?: ConfigurationResponse[];
 }

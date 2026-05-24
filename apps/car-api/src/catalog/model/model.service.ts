@@ -8,8 +8,8 @@ import {
   NotFoundException,
 } from '../../shared/exceptions/domain_exception/domain-exception.js';
 import { toDto } from '../../utils/to-dto.js';
-import { ReadProductDto } from './dto/read.dto.js';
-import { CreateProductDto } from './dto/create.dto.js';
+import { ReadProductDto } from './dto/read-model.dto.js';
+import { CreateProductDto } from './dto/create-info.dto.js';
 import { AdminReadProductDto } from './dto/admin-read.dto.js';
 import {
   getInternalErrorCode,
@@ -20,7 +20,7 @@ import { PrismaErrorCode } from '@delivest/common';
 import { UpdateProductDto } from './dto/update.dto.js';
 import { UploadFile } from '../../media/interface/upload-file.interface.js';
 import { PhotoEditorService } from '../../media/photo-queue/photo-editor.service.js';
-import { DelivestEvent, PhotoMap } from '../../shared/events/types.js';
+import { ProjectEvent, PhotoMap } from '../../shared/events/types.js';
 import type {
   PhotoConversionEvent,
   PhotoConversionFailedEvent,

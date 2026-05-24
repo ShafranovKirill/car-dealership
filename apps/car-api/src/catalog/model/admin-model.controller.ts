@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { ProductService } from './product.service.js';
 import { Permission } from '../../../generated/prisma/enums.js';
-import { CreateProductDto } from './dto/create.dto.js';
+import { CreateProductDto } from './dto/create-info.dto.js';
 import { UpdateProductDto } from './dto/update.dto.js';
 import { AdminReadProductDto } from './dto/admin-read.dto.js';
 import { JwtStaffAuthGuard } from '../../identify/index.js';

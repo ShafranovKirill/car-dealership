@@ -1,7 +1,16 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
 model Brand {
   id        String     @id @default(uuid())
   name      String     @unique
-  logo      String
+  images      Json?
   carModels CarModel[]
 
   createdAt DateTime @default(now()) @map("created_at")

@@ -12,18 +12,6 @@ export interface ConfigurationResponse {
   updatedAt: Date | string;
 }
 
-export interface ConfigurationFullResponse extends ConfigurationResponse {
-  carModel?: CarModelResponse;
-}
-
-export interface FindConfigurationRequest {
-  id: string;
-}
-
-export interface FindConfigurationByModelRequest {
-  carModelId: string;
-}
-
 export interface CreateConfigurationRequest {
   name: string;
   price: number;

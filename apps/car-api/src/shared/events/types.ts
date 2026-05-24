@@ -1,9 +1,9 @@
 import { PhotoKey } from '@car/common';
 
-export enum DelivestEvent {
+export enum ProjectEvent {
   AUTH_CODE_REQUESTED = 'auth-code.requested',
-  PRODUCT_PHOTO_CONVERTED = 'product.photo.converted',
-  PRODUCT_PHOTO_CONVERSION_FAILED = 'product.photo.conversion.failed',
+  BRAND_PHOTO_CONVERTED = 'brand.photo.converted',
+  BRAND_PHOTO_CONVERSION_FAILED = 'brand.photo.conversion.failed',
   CLIENT_LOGGED_IN = 'client.logged.in',
   STAFF_LOGGED_IN = 'staff.logged.in',
 }
