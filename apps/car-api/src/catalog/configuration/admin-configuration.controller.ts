@@ -17,6 +17,7 @@ import {
   ApiTags,
   ApiConsumes,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { JwtStaffAuthGuard } from '../../identify/index.js';
 import { ConfigurationService } from './configuration.service.js';
@@ -41,10 +42,12 @@ export class AdminConfigurationController {
     return this.service.create(dto);
   }
 
-  @Get('all')
-  @ApiOperation({ summary: 'Получить все конфигурации' })
-  async findAll(): Promise<ReadConfigurationDto[]> {
-    return this.service.findAll();
+  @Get('model/:modelId')
+  @ApiOperation({ summary: 'Получить все конфигурации по модели' })
+  async findAllByModel(
+    @Param('modelId') modelId: string,
+  ): Promise<ReadConfigurationDto[]> {
+    return this.service.findAllByModel(modelId);
   }
 
   @Delete('delete/:configurationId')
@@ -101,5 +104,26 @@ export class AdminConfigurationController {
       configurationId,
       socketId,
     );
+  }
+
+  @Delete(':configurationId/photo')
+  @ApiOperation({
+    summary: 'Удалить фотографию из галереи по её S3 ключу',
+    description:
+      'Ищет переданный ключ в массиве, определяет его индекс и удаляет этот индекс из всех размеров',
+  })
+  @ApiQuery({
+    name: 'fileKey',
+    description: 'Полный S3 ключ файла (например, cd7b7b17.../9e13e5ed...)',
+    required: true,
+  })
+  async deletePhotoByKey(
+    @Param('configurationId') configurationId: string,
+    @Query('fileKey') fileKey: string,
+  ): Promise<void> {
+    if (!fileKey) {
+      throw new BadRequestException('Параметр fileKey обязателен');
+    }
+    return this.service.deletePhotoByKey(configurationId, fileKey);
   }
 }

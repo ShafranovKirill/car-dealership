@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ConfigurationService } from './configuration.service.js';
 import { ReadConfigurationDto } from './dto/read.dto.js';
@@ -8,9 +8,11 @@ import { ReadConfigurationDto } from './dto/read.dto.js';
 export class ConfigurationController {
   constructor(private readonly service: ConfigurationService) {}
 
-  @Get('all')
+  @Get('/model/:modelId')
   @ApiOperation({ summary: 'Получить все конфигурации' })
-  async findAll(): Promise<ReadConfigurationDto[]> {
-    return this.service.findAll();
+  async findAllByModel(
+    @Param('modelId') modelId: string,
+  ): Promise<ReadConfigurationDto[]> {
+    return this.service.findAllByModel(modelId);
   }
 }

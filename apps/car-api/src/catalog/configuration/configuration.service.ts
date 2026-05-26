@@ -40,8 +40,10 @@ export class ConfigurationService {
     private readonly notificationGateway: NotificationGateway,
   ) {}
 
-  async findAll(): Promise<ReadConfigurationDto[]> {
-    const configurations = await this.prisma.configuration.findMany({});
+  async findAllByModel(modelId: string): Promise<ReadConfigurationDto[]> {
+    const configurations = await this.prisma.configuration.findMany({
+      where: { carModelId: modelId },
+    });
     return configurations.map((configuration) =>
       toDto(configuration, ReadConfigurationDto),
     );
@@ -87,41 +89,43 @@ export class ConfigurationService {
     const { targetId, socketId, photos } = payload;
 
     try {
-      const existing = await this.prisma.configuration.findUnique({
+      const existingConfiguration = await this.prisma.configuration.findUnique({
         where: { id: targetId },
         select: { images: true },
       });
 
-      await this.prisma.configuration.update({
-        where: { id: targetId },
-        data: { images: photos },
-      });
+      const currentImages =
+        (existingConfiguration?.images as Record<string, string[]>) || {};
 
-      if (existing?.images) {
-        const oldPhotos = existing.images as Record<string, string>;
-        const newKeys = new Set(Object.values(photos));
-        const keysToDelete = Object.values(oldPhotos).filter(
-          (oldKey) => oldKey && !newKeys.has(oldKey),
-        );
+      const updatedImages: Record<string, string[]> = {};
 
-        if (keysToDelete.length > 0) {
-          await this.mediaService.deleteFilesByKeys(keysToDelete);
-          this.logger.log(
-            `handleConfigurationPhotoBatch() | Cleanup | Deleted ${keysToDelete.length} old photos for configuration ${targetId}`,
-          );
+      for (const [sizeKey, newFilePath] of Object.entries(photos)) {
+        const sizeArray = currentImages[sizeKey] || [];
+
+        updatedImages[sizeKey] = [...sizeArray, newFilePath];
+      }
+
+      for (const [key, value] of Object.entries(currentImages)) {
+        if (!updatedImages[key]) {
+          updatedImages[key] = value;
         }
       }
 
+      await this.prisma.configuration.update({
+        where: { id: targetId },
+        data: { images: updatedImages },
+      });
+
       this.logger.log(
-        `handleConfigurationPhotoBatch() success | Configuration photos updated | id: ${targetId}`,
+        `handleConfigurationPhotoBatch() success | Added photo to size-arrays for configuration ${targetId}`,
       );
 
       this.notificationGateway.server
         .to(socketId)
         .emit(SocketEvent.PHOTO_EDIT_RESULT, {
           success: true,
-          targetId,
-          photos,
+          configurationId: targetId,
+          images: updatedImages,
         });
     } catch (error) {
       this.logger.error(
@@ -178,6 +182,80 @@ export class ConfigurationService {
     } catch (error) {
       this.handleConfigurationConstraintError(error);
     }
+  }
+
+  async deletePhotoByKey(
+    configurationId: string,
+    fileKey: string,
+  ): Promise<void> {
+    const configuration = await this.prisma.configuration.findUnique({
+      where: { id: configurationId },
+      select: { images: true },
+    });
+
+    if (!configuration) {
+      throw new NotFoundException(
+        `Конфигурация с ID ${configurationId} не найдена`,
+      );
+    }
+
+    if (!configuration.images) {
+      throw new BadRequestException(
+        'У данной конфигурации нет загруженных фотографий',
+      );
+    }
+
+    const images = configuration.images as Record<string, string[]>;
+    let targetIndex = -1;
+
+    for (const filesArray of Object.values(images)) {
+      if (Array.isArray(filesArray)) {
+        targetIndex = filesArray.indexOf(fileKey);
+        if (targetIndex !== -1) break;
+      }
+    }
+
+    if (targetIndex === -1) {
+      throw new NotFoundException(
+        `Указанный файл не найден в галерее этой конфигурации`,
+      );
+    }
+
+    const keysToDeleteFromS3: string[] = [];
+    const updatedImages: Record<string, string[]> = {};
+
+    for (const [sizeKey, filesArray] of Object.entries(images)) {
+      if (!Array.isArray(filesArray)) {
+        updatedImages[sizeKey] = filesArray;
+        continue;
+      }
+
+      const keyToDelete = filesArray[targetIndex];
+      if (keyToDelete) {
+        keysToDeleteFromS3.push(keyToDelete);
+      }
+
+      updatedImages[sizeKey] = filesArray.filter((_, i) => i !== targetIndex);
+    }
+
+    if (keysToDeleteFromS3.length > 0) {
+      try {
+        await this.mediaService.deleteFilesByKeys(keysToDeleteFromS3);
+      } catch (s3Error) {
+        this.logger.error(
+          `Ошибка S3 при удалении файлов для конфигурации ${configurationId} по ключу ${fileKey}: ${(s3Error as Error).message}`,
+        );
+      }
+    }
+
+    await this.prisma.configuration.update({
+      where: { id: configurationId },
+      data: { images: updatedImages },
+    });
+
+    this.logger.log(
+      `deletePhotoByKey() success | Фотка удалена по ключу. Индекс в массивах: ${targetIndex}. Конфигурация: ${configurationId}`,
+    );
   }
 
   async delete(configurationId: string): Promise<void> {

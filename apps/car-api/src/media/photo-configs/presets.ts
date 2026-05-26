@@ -4,32 +4,32 @@ import { PHOTO_PROFILES } from './profiles.js';
 export const BRAND_PHOTO_PRESETS = [
   {
     profile: PHOTO_PROFILES.PHOTO_XS,
-    key: PHOTO_KEYS.PRODUCT_CARD,
+    key: PHOTO_KEYS.PHOTO_XS,
   },
   {
     profile: PHOTO_PROFILES.PHOTO_MD,
-    key: PHOTO_KEYS.PRODUCT_PREVIEW,
+    key: PHOTO_KEYS.PHOTO_MD,
   },
 ];
 
 export const MODEL_PHOTO_PRESETS = [
   {
     profile: PHOTO_PROFILES.PHOTO_XS,
-    key: PHOTO_KEYS.PRODUCT_CARD,
+    key: PHOTO_KEYS.PHOTO_XS,
   },
   {
     profile: PHOTO_PROFILES.PHOTO_MD,
-    key: PHOTO_KEYS.PRODUCT_PREVIEW,
+    key: PHOTO_KEYS.PHOTO_MD,
   },
 ];
 
 export const CONFIGURATION_PHOTO_PRESETS = [
   {
     profile: PHOTO_PROFILES.PHOTO_XS,
-    key: PHOTO_KEYS.PRODUCT_CARD,
+    key: PHOTO_KEYS.PHOTO_XS,
   },
   {
     profile: PHOTO_PROFILES.PHOTO_MD,
-    key: PHOTO_KEYS.PRODUCT_PREVIEW,
+    key: PHOTO_KEYS.PHOTO_MD,
   },
 ];

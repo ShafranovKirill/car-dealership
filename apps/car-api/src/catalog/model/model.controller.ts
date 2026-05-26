@@ -9,7 +9,6 @@ import {
 import { ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { ModelService } from './model.service.js';
 import { CarModelResponseDto } from './dto/read-model.dto.js';
-import { CarModelFullResponseDto } from './dto/read-full.dto.js';
 
 @ApiTags('Model (Модели машин)')
 @Controller('model')
@@ -31,7 +30,7 @@ export class ModelController {
   @ApiOperation({ summary: 'Получить модель по ID' })
   async findById(
     @Param('modelId') modelId: string,
-  ): Promise<CarModelFullResponseDto> {
+  ): Promise<CarModelResponseDto> {
     return this.modelService.findById(modelId);
   }
 }

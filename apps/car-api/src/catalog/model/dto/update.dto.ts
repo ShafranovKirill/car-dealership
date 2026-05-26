@@ -1,24 +1,10 @@
-import {
-  ApiPropertyOptional,
-  ApiProperty,
-  OmitType,
-  PartialType,
-} from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsUUID,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 import { CreateCarModelRequestDto } from './create.dto.js';
 import { UpdateCarModelRequest } from '@car/types';
-import { UpdateCarTechnicalInfoRequestDto } from './update-info.dto.js';
 
 export class UpdateCarModelRequestDto
-  extends PartialType(
-    OmitType(CreateCarModelRequestDto, ['technicalInfo'] as const),
-  )
+  extends PartialType(CreateCarModelRequestDto)
   implements UpdateCarModelRequest
 {
   @ApiProperty({
@@ -28,13 +14,4 @@ export class UpdateCarModelRequestDto
   @IsUUID()
   @IsNotEmpty()
   modelId!: string;
-
-  @ApiPropertyOptional({
-    description: 'Частичное обновление технических характеристик',
-    type: () => UpdateCarTechnicalInfoRequestDto,
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => UpdateCarTechnicalInfoRequestDto)
-  technicalInfo?: UpdateCarTechnicalInfoRequestDto;
 }

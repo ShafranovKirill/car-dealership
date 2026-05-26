@@ -28,7 +28,6 @@ import type {
 import { ProjectEvent } from '../../shared/events/types.js';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MODEL_PHOTO_PRESETS } from '../../media/photo-configs/presets.js';
-import { CarModelFullResponseDto } from './dto/read-full.dto.js';
 
 @Injectable()
 export class ModelService {
@@ -53,11 +52,10 @@ export class ModelService {
     return carModels.map((carModel) => toDto(carModel, CarModelResponseDto));
   }
 
-  async findById(modelId: string): Promise<CarModelFullResponseDto> {
+  async findById(modelId: string): Promise<CarModelResponseDto> {
     const carModel = await this.prisma.carModel.findUnique({
       where: { id: modelId },
       include: {
-        technicalInfo: true,
         configurations: true,
       },
     });
@@ -66,7 +64,7 @@ export class ModelService {
       throw new NotFoundException(`Car model with ID ${modelId} not found`);
     }
 
-    return toDto(carModel, CarModelFullResponseDto);
+    return toDto(carModel, CarModelResponseDto);
   }
 
   async create(dto: CreateCarModelRequestDto): Promise<CarModelResponseDto> {
@@ -74,9 +72,6 @@ export class ModelService {
       const carModel = await this.prisma.carModel.create({
         data: {
           ...dto,
-          technicalInfo: dto.technicalInfo
-            ? { create: dto.technicalInfo }
-            : undefined,
         },
       });
 
@@ -88,21 +83,12 @@ export class ModelService {
 
   async update(dto: UpdateCarModelRequestDto): Promise<CarModelResponseDto> {
     try {
-      const { modelId, technicalInfo, ...carModelData } = dto;
+      const { modelId, ...carModelData } = dto;
 
       const carModel = await this.prisma.carModel.update({
         where: { id: modelId },
         data: {
           ...carModelData,
-
-          technicalInfo: technicalInfo
-            ? {
-                update: technicalInfo,
-              }
-            : undefined,
-        },
-        include: {
-          technicalInfo: true,
         },
       });
 
@@ -121,7 +107,77 @@ export class ModelService {
       this.handleModelConstraintError(error);
     }
   }
+  async deletePhotoByKey(modelId: string, fileKey: string): Promise<void> {
+    const carModel = await this.prisma.carModel.findUnique({
+      where: { id: modelId },
+      select: { images: true },
+    });
 
+    if (!carModel) {
+      throw new NotFoundException(
+        `Модель автомобиля с ID ${modelId} не найдена`,
+      );
+    }
+
+    if (!carModel.images) {
+      throw new BadRequestException(
+        'У данной модели нет загруженных фотографий',
+      );
+    }
+
+    const images = carModel.images as Record<string, string[]>;
+
+    let targetIndex = -1;
+
+    for (const filesArray of Object.values(images)) {
+      if (Array.isArray(filesArray)) {
+        targetIndex = filesArray.indexOf(fileKey);
+        if (targetIndex !== -1) break;
+      }
+    }
+
+    if (targetIndex === -1) {
+      throw new NotFoundException(
+        `Указанный файл не найден в галерее этой модели`,
+      );
+    }
+
+    const keysToDeleteFromS3: string[] = [];
+    const updatedImages: Record<string, string[]> = {};
+
+    for (const [sizeKey, filesArray] of Object.entries(images)) {
+      if (!Array.isArray(filesArray)) {
+        updatedImages[sizeKey] = filesArray;
+        continue;
+      }
+
+      const keyToDelete = filesArray[targetIndex];
+      if (keyToDelete) {
+        keysToDeleteFromS3.push(keyToDelete);
+      }
+
+      updatedImages[sizeKey] = filesArray.filter((_, i) => i !== targetIndex);
+    }
+
+    if (keysToDeleteFromS3.length > 0) {
+      try {
+        await this.mediaService.deleteFilesByKeys(keysToDeleteFromS3);
+      } catch (s3Error) {
+        this.logger.error(
+          `Ошибка S3 при удалении файлов для модели ${modelId} по ключу ${fileKey}: ${(s3Error as Error).message}`,
+        );
+      }
+    }
+
+    await this.prisma.carModel.update({
+      where: { id: modelId },
+      data: { images: updatedImages },
+    });
+
+    this.logger.log(
+      `deletePhotoByKey() success | Фотка удалена по ключу. Индекс в массивах: ${targetIndex}. Модель: ${modelId}`,
+    );
+  }
   async updatePhoto(
     file: UploadFile,
     modelId: string,
@@ -165,36 +221,38 @@ export class ModelService {
         select: { images: true },
       });
 
-      await this.prisma.carModel.update({
-        where: { id: targetId },
-        data: { images: photos },
-      });
+      const currentImages =
+        (existingModel?.images as Record<string, string[]>) || {};
 
-      if (existingModel?.images) {
-        const oldPhotos = existingModel.images as Record<string, string>;
-        const newKeys = new Set(Object.values(photos));
-        const keysToDelete = Object.values(oldPhotos).filter(
-          (oldKey) => oldKey && !newKeys.has(oldKey),
-        );
+      const updatedImages: Record<string, string[]> = {};
 
-        if (keysToDelete.length > 0) {
-          await this.mediaService.deleteFilesByKeys(keysToDelete);
-          this.logger.log(
-            `handleModelPhotoBatch() | Cleanup | Deleted ${keysToDelete.length} old photos for model ${targetId}`,
-          );
+      for (const [sizeKey, newFilePath] of Object.entries(photos)) {
+        const sizeArray = currentImages[sizeKey] || [];
+
+        updatedImages[sizeKey] = [...sizeArray, newFilePath];
+      }
+
+      for (const [key, value] of Object.entries(currentImages)) {
+        if (!updatedImages[key]) {
+          updatedImages[key] = value;
         }
       }
 
+      await this.prisma.carModel.update({
+        where: { id: targetId },
+        data: { images: updatedImages },
+      });
+
       this.logger.log(
-        `handleModelPhotoBatch() success | Model photos updated | id: ${targetId}`,
+        `handleModelPhotoBatch() success | Added photo to size-arrays for model ${targetId}`,
       );
 
       this.notificationGateway.server
         .to(socketId)
         .emit(SocketEvent.PHOTO_EDIT_RESULT, {
           success: true,
-          targetId,
-          photos,
+          modelId: targetId,
+          images: updatedImages,
         });
     } catch (error) {
       this.logger.error(
@@ -202,7 +260,6 @@ export class ModelService {
       );
     }
   }
-
   @OnEvent(ProjectEvent.MODEL_PHOTO_CONVERSION_FAILED)
   handlePhotoConversionFailedEvent(event: PhotoConversionFailedEvent): void {
     const { fileId, error } = event;

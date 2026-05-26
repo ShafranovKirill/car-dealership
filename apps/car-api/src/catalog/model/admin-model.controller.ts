@@ -28,7 +28,6 @@ import { BadRequestException } from '../../shared/exceptions/domain_exception/do
 import { CreateCarModelRequestDto } from './dto/create.dto.js';
 import { CarModelResponseDto } from './dto/read-model.dto.js';
 import { UpdateCarModelRequestDto } from './dto/update.dto.js';
-import { CarModelFullResponseDto } from './dto/read-full.dto.js';
 
 @ApiTags('Admin-model (Модели машин - админ)')
 @Controller('admin/model')
@@ -60,7 +59,7 @@ export class AdminModelController {
   @ApiOperation({ summary: 'Получить модель по ID' })
   async findById(
     @Param('modelId') modelId: string,
-  ): Promise<CarModelFullResponseDto> {
+  ): Promise<CarModelResponseDto> {
     return this.service.findById(modelId);
   }
 
@@ -76,6 +75,27 @@ export class AdminModelController {
     @Body() dto: UpdateCarModelRequestDto,
   ): Promise<CarModelResponseDto> {
     return this.service.update(dto);
+  }
+
+  @Delete(':modelId/photo')
+  @ApiOperation({
+    summary: 'Удалить фотографию из галереи по её S3 ключу',
+    description:
+      'Ищет переданный ключ в массиве, определяет его индекс и удаляет этот индекс из всех размеров',
+  })
+  @ApiQuery({
+    name: 'fileKey',
+    description: 'Полный S3 ключ файла (например, cd7b7b17.../9e13e5ed...)',
+    required: true,
+  })
+  async deletePhotoByKey(
+    @Param('modelId') modelId: string,
+    @Query('fileKey') fileKey: string,
+  ): Promise<void> {
+    if (!fileKey) {
+      throw new BadRequestException('Параметр fileKey обязателен');
+    }
+    return this.service.deletePhotoByKey(modelId, fileKey);
   }
 
   @Post(':id/photo')

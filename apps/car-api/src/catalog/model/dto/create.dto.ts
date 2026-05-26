@@ -7,12 +7,15 @@ import {
   IsString,
   IsUUID,
   Min,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { CreateCarModelRequest } from '@car/types';
-import { BodyType, CarClass } from '../../../../generated/prisma/client.js';
-import { CreateCarTechnicalInfoRequestDto } from './create-info.dto.js';
+import {
+  BodyType,
+  CarClass,
+  DriveType,
+  EngineType,
+  TransmissionType,
+} from '../../../../generated/prisma/client.js';
 
 export class CreateCarModelRequestDto implements CreateCarModelRequest {
   @ApiProperty({ example: '5 Series' })
@@ -54,9 +57,72 @@ export class CreateCarModelRequestDto implements CreateCarModelRequest {
   @IsNotEmpty()
   brandId!: string;
 
-  @ApiPropertyOptional({ type: () => CreateCarTechnicalInfoRequestDto })
+  @ApiProperty({ example: 4935 })
+  @IsNumber()
+  @Min(0)
+  length!: number;
+
+  @ApiProperty({ example: 1868 })
+  @IsNumber()
+  @Min(0)
+  width!: number;
+
+  @ApiProperty({ example: 1466 })
+  @IsNumber()
+  @Min(0)
+  height!: number;
+
+  @ApiProperty({ example: 2975 })
+  @IsNumber()
+  @Min(0)
+  wheelbase!: number;
+
+  @ApiProperty({ example: 140 })
+  @IsNumber()
+  @Min(0)
+  clearance!: number;
+
+  @ApiProperty({ example: 530 })
+  @IsNumber()
+  @Min(0)
+  trunkVolume!: number;
+
+  @ApiPropertyOptional({ example: 1700 })
+  @IsNumber()
+  @Min(0)
   @IsOptional()
-  @ValidateNested()
-  @Type(() => CreateCarTechnicalInfoRequestDto)
-  technicalInfo?: CreateCarTechnicalInfoRequestDto;
+  trunkMaxVolume?: number;
+
+  @ApiProperty({ enum: EngineType, example: EngineType.BENZIN })
+  @IsEnum(EngineType)
+  engineType!: EngineType;
+
+  @ApiProperty({ example: 2.0 })
+  @IsNumber()
+  @Min(0)
+  engineVolume!: number;
+
+  @ApiProperty({ example: 249 })
+  @IsNumber()
+  @Min(0)
+  enginePower!: number;
+
+  @ApiProperty({ example: 350 })
+  @IsNumber()
+  @Min(0)
+  engineTorque!: number;
+
+  @ApiPropertyOptional({ example: 4 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  cylindersCount?: number;
+
+  @ApiProperty({ enum: TransmissionType, example: TransmissionType.AUTOMATIC })
+  @IsEnum(TransmissionType)
+  transmission!: TransmissionType;
+
+  @ApiProperty({ enum: DriveType, example: DriveType.AWD })
+  @IsEnum(DriveType)
+  driveType!: DriveType;
 }
