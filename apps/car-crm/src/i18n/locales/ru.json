@@ -1,0 +1,290 @@
+{
+  "auth": {
+    "login_title": "Авторизация",
+    "login_label": "Логин",
+    "login_placeholder": "Введите ваш логин",
+    "password_label": "Пароль",
+    "password_placeholder": "Введите пароль",
+    "login_button": "Войти",
+    "success_title": "Вход выполнен",
+    "error_title": "Ошибка входа",
+    "login_error": "Неверные данные",
+    "logout_button": "Выйти из системы"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "user_info": "Данные профиля",
+    "status_active": "Сессия активна. Все системы работают штатно.",
+    "logout_button": "Выйти"
+  },
+  "branches": {
+    "list": {
+      "title": "Филиалы",
+      "subtitle": "Управление списком всех отделений компании",
+      "add_button": "Добавить филиал",
+      "empty": "Филиалы не найдены",
+      "switch_confirm_msg": "Вы действительно хотите перейти в филиал",
+      "switch_confirm_title": "Подтвердите переход на страницу другого филиала"
+    },
+    "create": {
+      "title": "Новый филиал",
+      "success_summary": "Успешно",
+      "success_detail": "Филиал успешно создан",
+      "error_summary": "Ошибка",
+      "error_detail": "Не удалось создать филиал"
+    },
+    "update": {
+      "title": "Редактировать филиал",
+      "success_summary": "Успешно",
+      "success_detail": "Данные филиала обновлены",
+      "error_summary": "Ошибка",
+      "error_detail": "Не удалось сохранить изменения"
+    },
+    "form": {
+      "name": "Название филиала",
+      "name_placeholder_new": "Например: Центральный офис",
+      "alias": "Алиас (короткое имя)",
+      "alias_placeholder": "Например: central",
+      "alias_hint": "Используется для URL и идентификации",
+      "address": "Адрес",
+      "address_placeholder_new": "Укажите фактический адрес филиала",
+      "description": "Описание",
+      "description_placeholder": "Укажите описание филиала",
+      "phone": "Номер телефона",
+      "phone_format": "Формат: +7 и 10 цифр номера",
+      "address_placeholder": "Укажите адрес филиала",
+      "name_placeholder": "Напрмер: Наугорское шоссе"
+    },
+    "delete": {
+      "title": "Подтверждение удаления",
+      "confirmation_text": "Вы уверены, что хотите удалить филиал",
+      "success_summary": "Успешно",
+      "success_detail": "Филиал \"{name}\" удален",
+      "error_summary": "Ошибка",
+      "error_detail": "Не удалось удалить филиал"
+    },
+    "select_title": "Выберите филиал",
+    "select_subtitle": "Для продолжения работы выберите доступную точку",
+    "no_branches": "У вас нет доступных филиалов. Обратитесь к администратору.",
+    "current_branch": "Текущий филиал",
+    "change_branch": "Сменить филиал",
+    "no_branches_title": "Доступ закрыт",
+    "no_branches_found": "За вашим аккаунтом не закреплено ни одного филиала. Пожалуйста, свяжитесь с администратором для получения доступа.",
+    "logout": "Выйти из аккаунта"
+  },
+  "error-view": {
+    "404": {
+      "title": "Упс! Страница потерялась",
+      "description": "Похоже, этот адрес ведет в никуда. Возможно, страница была удалена или вы просто ошиблись дверью.",
+      "back_button": "Вернуться домой"
+    }
+  },
+  "menu": {
+    "orders": "Заказы",
+    "branch": "Филиал",
+    "products": "Товары",
+    "categories": "Категории",
+    "employees": "Сотрудники",
+    "changeBranch": "Сменить филиал",
+    "lightTheme": "Светлая тема",
+    "darkTheme": "Темная тема",
+    "staff": "Сотрудник",
+    "accessYes": "Доступ разрешен",
+    "administration": "Панель администратора",
+    "admin_panel": "Админ",
+    "all_staff": "Сотрудники",
+    "system_logs": "Филиалы",
+    "organization": "Организация",
+    "team": "Команда",
+    "role": "Должности",
+    "categories-name": "Название категории",
+    "categories-name-placeholder": "Например: напитки",
+    "collapseSidebar": "Свернуть меню",
+    "expandSidebar": "Развернуть меню"
+  },
+  "common": {
+    "select": "Выбрать",
+    "loading": "Загрузка конфигурации...",
+    "error": "Произошла ошибка",
+    "search": "Поиск...",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "create": "Создать",
+    "confirm": "Подтвердить"
+  },
+  "product": {
+    "create": {
+      "cr": "Создать товар",
+      "title": "Создание товара",
+      "success_summary": "Успешно",
+      "success_detail": "Товар создан",
+      "error_summary": "Ошибка",
+      "error_detail": "Не удалось создать товар"
+    },
+    "update": {
+      "title": "Редактирование товара",
+      "success_summary": "Успешно",
+      "success_detail": "Товар обновлен",
+      "error_summary": "Ошибка",
+      "error_detail": "Не удалось обновить товар"
+    },
+    "delete": {
+      "title": "Удаление товара",
+      "confirmation_text": "Вы действительно хотите удалить товар",
+      "success_summary": "Успешно",
+      "success_detail": "Товар \"{name}\" удален",
+      "error_summary": "Ошибка",
+      "error_detail": "Не удалось удалить товар"
+    },
+    "form": {
+      "name": "Название",
+      "name_placeholder": "Например: Яблочный сок",
+      "name_required": "Название товара обязательно",
+      "category": "Категория",
+      "category_placeholder": "Выберите категорию",
+      "category_required": "Выберите категорию товара",
+      "price": "Цена",
+      "quantity": "Кол-во",
+      "weight": "Вес (г)",
+      "description": "Описание",
+      "image_upload": "Выбрать фото"
+    },
+    "list": {
+      "select_branch": "Выберите филиал для просмотра товаров",
+      "select_branch_with_name": "товары филиала {name}",
+      "empty": "Для выбранного филиала товары не найдены",
+      "no_items_in_category": "Товары в этой категории отсутствуют",
+      "no_category": "Без категории",
+      "items_count": "товаров",
+      "image_load_error": "Ошибка при загрузке фото",
+      "image_uploaded_successfully": "Фото успешно загружено",
+      "drag_order_error": "Ошибка при сохранении порядка продукта"
+    }
+  },
+  "permissions": {
+    "groups": {
+      "staff": "Управление сотрудниками",
+      "clients": "Клиенты и контрагенты",
+      "roles": "Роли и права доступа",
+      "products": "Каталог товаров",
+      "categories": "Категории товаров",
+      "branches": "Управление филиалами",
+      "orders": "Заказы и продажи"
+    },
+    "items": {
+      "STAFF_READ": "Просмотр списка сотрудников",
+      "STAFF_CREATE": "Добавление сотрудников",
+      "STAFF_UPDATE": "Редактирование сотрудников",
+      "STAFF_DELETE": "Удаление сотрудников",
+      "CLIENT_READ": "Просмотр клиентов",
+      "CLIENT_CREATE": "Регистрация клиентов",
+      "CLIENT_UPDATE": "Изменение данных клиентов",
+      "CLIENT_DELETE": "Удаление клиентов",
+      "ROLE_READ": "Просмотр ролей",
+      "ROLE_CREATE": "Создание новых ролей",
+      "ROLE_UPDATE": "Изменение прав ролей",
+      "ROLE_DELETE": "Удаление ролей",
+      "PRODUCT_READ": "Просмотр товаров",
+      "PRODUCT_CREATE": "Добавление товаров",
+      "PRODUCT_UPDATE": "Редактирование товаров",
+      "PRODUCT_DELETE": "Удаление товаров",
+      "CATEGORY_READ": "Просмотр категорий",
+      "CATEGORY_CREATE": "Создание категорий",
+      "CATEGORY_UPDATE": "Изменение категорий",
+      "CATEGORY_DELETE": "Удаление категорий",
+      "BRANCH_READ": "Просмотр филиалов",
+      "BRANCH_CREATE": "Открытие филиалов",
+      "BRANCH_UPDATE": "Редактирование филиалов",
+      "BRANCH_DELETE": "Закрытие филиалов",
+      "ORDER_READ": "Просмотр заказов",
+      "ORDER_CREATE": "Создание заказов",
+      "ORDER_UPDATE": "Редактирование заказов",
+      "ORDER_DELETE": "Отмена/удаление заказов"
+    }
+  },
+  "roles": {
+    "list": {
+      "title": "Должности",
+      "subtitle": "Управление должностями и правами",
+      "add_button": "Добавить роль",
+      "selected": "Выбрано",
+      "out-of": "из"
+    },
+    "create": {
+      "success_summary": "Успешно",
+      "success_detail": "Новая роль создана",
+      "error_summary": "Ошибка создания",
+      "error_detail": "Не удалось создать роль",
+      "title": "Создание должности"
+    },
+    "update": {
+      "success_summary": "Обновлено",
+      "success_detail": "Настройки роли сохранены",
+      "error_summary": "Ошибка обновления",
+      "error_detail": "Не удалось обновить роль"
+    },
+    "delete": {
+      "success_summary": "Удалено",
+      "success_detail": "Роль \"{name}\" успешно удалена",
+      "error_summary": "Ошибка удаления",
+      "error_detail": "Не удалось удалить роль, возможно она используется"
+    },
+    "form": {
+      "name": "Название должности",
+      "name_placeholder": "Например: кассир",
+      "permissions": "Разрешения должности (права)",
+      "permissions_hint": "какими правами владеет сотрудник"
+    },
+    "edit": {
+      "title": "Изменение параметров должности"
+    }
+  },
+  "staff": {
+    "list": {
+      "add_button": "Добавить сотрудника",
+      "title": "Сотрудники",
+      "subtitle": "Управляйте сотрудниками",
+      "empty": "Сотрудники не найдены"
+    },
+    "branch": {
+      "title": "Сотрудники филиала",
+      "subtitle": "Создавайте и редактируйте работников филиала",
+      "empty": "Сотрудники не найдены"
+    },
+    "create": {
+      "title": "Создание работника",
+      "success_summary": "Сотрудник добавлен",
+      "success_detail": "Новый сотрудник успешно зарегистрирован в системе"
+    },
+    "update": {
+      "success_summary": "Данные обновлены",
+      "success_detail": "Информация о сотруднике успешно сохранена"
+    },
+    "delete": {
+      "confirmation_text": "Вы действительно хотите удалить сотрудника",
+      "title": "Удаление сотрудника",
+      "success_summary": "Сотрудник успешно удален",
+      "success_detail": "Подробнее:"
+    },
+    "edit": {
+      "title": "Изменить работника"
+    },
+    "form": {
+      "name": "Имя сотрудника",
+      "name_placeholder": "Например: Иван Гончаров",
+      "login": "Логин сотрудника",
+      "login_placeholder": "Логин сотрудника для входа в аккаунт!",
+      "password_placeholder": "Пароль сотрудника для входа в аккаунт!",
+      "password": "Пароль сотрудника",
+      "role": "Должность сотрудника",
+      "role_placeholder": "Выберите должность сотрудника",
+      "branches": "Доступные филиалы",
+      "branches_placeholder": "Выберите филиалы доступные сотруднику"
+    }
+  },
+  "category": {
+    "order": "Порядок",
+    "create": "Создать категорию"
+  }
+}

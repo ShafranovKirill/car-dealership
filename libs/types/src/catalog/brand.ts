@@ -1,5 +1,4 @@
 import { PhotoKey } from "@common/photo-keys.js";
-import { CarModelResponse } from "./model.js";
 
 export interface BrandResponse {
   id: string;

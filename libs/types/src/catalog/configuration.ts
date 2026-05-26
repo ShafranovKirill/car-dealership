@@ -1,4 +1,3 @@
-import { CarModelResponse } from "./model.js";
 import { PhotoKey } from "@common/photo-keys.js";
 
 export interface ConfigurationResponse {

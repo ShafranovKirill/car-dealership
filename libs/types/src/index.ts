@@ -1,5 +1,4 @@
 export * from "./identify/staff.js";
-export * from "./media/media.js";
 export * from "./event/socket.event.js";
 export * from "./catalog/brand.js";
 export * from "./catalog/model.js";
