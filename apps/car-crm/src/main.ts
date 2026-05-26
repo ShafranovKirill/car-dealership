@@ -15,7 +15,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import i18n from "./i18n";
 import ToastService from "primevue/toastservice";
 import { ConfirmationService } from "primevue";
-import { useProductStore } from "@/stores/product.store";
 
 dayjs.locale("ru");
 dayjs.extend(relativeTime);
@@ -37,8 +36,5 @@ app.use(PrimeVue, {
   },
 });
 app.use(pinia);
-
-const productStore = useProductStore();
-productStore.initSocketListeners();
 
 app.mount("#app");

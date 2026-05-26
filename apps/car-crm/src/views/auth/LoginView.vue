@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useToast } from "primevue/usetoast";
 
@@ -11,12 +10,9 @@ import Button from "primevue/button";
 import axios from "axios";
 import type { ApiError } from "@/types/api";
 import { useAuthStore } from "@/stores/auth.store";
-import { useBranchStore } from "@/stores/branch.store";
 
 const { t } = useI18n();
-const router = useRouter();
 const toast = useToast();
-const branchStore = useBranchStore();
 const { login } = useAuthStore();
 const loading = ref(false);
 const form = reactive({
@@ -34,16 +30,8 @@ const handleLogin = async () => {
       life: 3000,
     });
 
-    const activeAlias = branchStore.activeBranchAlias;
 
-    if (activeAlias) {
-      await router.push({
-        name: "dashboard",
-        params: { branchAlias: activeAlias },
-      });
-    } else {
-      await router.push({ name: "select-branch" });
-    }
+
   } catch (error) {
     let errorMessage = t("auth.login_error");
 

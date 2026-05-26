@@ -1,10 +1,8 @@
 import type { RouteLocationNormalized } from "vue-router";
 import { useAuthStore } from "@/stores/auth.store";
-import { useBranchStore } from "@/stores/branch.store";
 
 export async function authMiddleware(to: RouteLocationNormalized, _from: RouteLocationNormalized) {
   const authStore = useAuthStore();
-  const branchStore = useBranchStore();
 
   if (!authStore.isInitialized) {
     await authStore.init();
@@ -18,13 +16,9 @@ export async function authMiddleware(to: RouteLocationNormalized, _from: RouteLo
   }
 
   if (guestOnly && isLoggedIn) {
-    if (branchStore.isBranchSelected) {
-      return {
-        name: "dashboard",
-        params: { branchAlias: branchStore.activeBranchAlias },
-      };
-    }
-    return { name: "select-branch" };
+    return {
+      name: "dashboard",
+    };
   }
 
   return true;
