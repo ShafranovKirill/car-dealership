@@ -6,7 +6,7 @@ export interface ConfigurationResponse {
   price: number;
   description: string;
   carModelId: string;
-  images: Record<PhotoKey, string>;
+  images: Record<PhotoKey, string> | null;
   createdAt: Date | string;
   updatedAt: Date | string;
 }

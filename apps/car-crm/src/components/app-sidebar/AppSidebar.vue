@@ -30,6 +30,11 @@ const menuItems = ref([
 </script>
 <template>
   <Sidebar v-model:visible="visible">
-
+    <div class="flex flex-col justify-between h-full">
+      <div><PanelMenu :model="menuItems"></PanelMenu></div>
+      <div>
+        <SidebarSettings v-model:isMenuOpen="visible" />
+      </div>
+    </div>
   </Sidebar>
 </template>

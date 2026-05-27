@@ -9,7 +9,7 @@ export interface CarModelResponse {
   yearTo?: number | null;
   bodyType: BodyType;
   carClass: CarClass;
-  images: Record<PhotoKey, string>;
+  images: Record<PhotoKey, string> | null;
   minPrice: number;
   brandId: string;
   length: number;

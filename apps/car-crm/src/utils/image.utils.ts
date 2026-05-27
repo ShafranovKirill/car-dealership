@@ -1,4 +1,4 @@
-import { PHOTO_KEYS, type PhotoKey } from "@car/common";
+import { type PhotoKey } from "@car/common";
 
 export const ImageHelper = {
   endpoint: import.meta.env.STORAGE_ENDPOINT_PUBLIC,
@@ -12,10 +12,7 @@ export const ImageHelper = {
     return `${base}/${this.bucket}/${fileKey}`;
   },
 
-  getXSPhotoUrl(
-    photos: Record<string, string> | null | undefined,
-    type: PhotoKey = PHOTO_KEYS.PHOTO_XS,
-  ): string | null {
+  getPhotoUrl(photos: Record<string, string> | null | undefined, type: PhotoKey): string | null {
     if (!photos) return null;
 
     const fileKey = photos[type];

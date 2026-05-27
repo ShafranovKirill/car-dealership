@@ -2,6 +2,7 @@
 import { ref, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import { useToast } from "primevue/usetoast";
+import { useRouter } from "vue-router";
 
 import Card from "primevue/card";
 import InputText from "primevue/inputtext";
@@ -13,6 +14,7 @@ import { useAuthStore } from "@/stores/auth.store";
 
 const { t } = useI18n();
 const toast = useToast();
+const router = useRouter();
 const { login } = useAuthStore();
 const loading = ref(false);
 const form = reactive({
@@ -21,6 +23,7 @@ const form = reactive({
 });
 
 const handleLogin = async () => {
+  loading.value = true;
   try {
     await login(form.login, form.password);
 
@@ -30,8 +33,7 @@ const handleLogin = async () => {
       life: 3000,
     });
 
-
-
+    router.push({ name: "main" });
   } catch (error) {
     let errorMessage = t("auth.login_error");
 
@@ -45,6 +47,8 @@ const handleLogin = async () => {
       detail: errorMessage,
       life: 5000,
     });
+  } finally {
+    loading.value = false;
   }
 };
 </script>

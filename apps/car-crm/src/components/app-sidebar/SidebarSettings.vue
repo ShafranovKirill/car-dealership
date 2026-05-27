@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 
 import { useThemeStore } from '@/stores/state/theme.store'
 import { useLangStore } from '@/stores/state/lang.store'
+import { useAuthStore } from '@/stores/auth.store'
 
-const router = useRouter()
 const themeStore = useThemeStore()
 const langStore = useLangStore()
+const authStore = useAuthStore()
 
-const handleChangeBranch = () => {
-  router.push({ name: 'branch-selection' })
-}
 
 const isMenuOpen = defineModel('isMenuOpen', { type: Boolean })
 </script>
@@ -45,12 +42,12 @@ const isMenuOpen = defineModel('isMenuOpen', { type: Boolean })
     />
 
     <Button
-      :label="'Сменить филиал'"
-      icon="pi pi-refresh"
-      severity="secondary"
+      :label="'Выход'"
+      icon="pi pi-sign-out"
+      severity="danger"
       text
       class="w-full justify-start py-2!"
-      @click="handleChangeBranch"
+      @click="authStore.logout()"
     />
   </div>
 </template>

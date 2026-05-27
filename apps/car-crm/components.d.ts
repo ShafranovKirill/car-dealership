@@ -11,8 +11,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    AppHeader: typeof import('./src/components/app-header/AppHeader.vue')['default']
     AppMenu: typeof import('./src/components/app-menu/AppMenu.vue')['default']
+    AppSidebar: typeof import('./src/components/app-sidebar/AppSidebar.vue')['default']
     Avatar: typeof import('primevue/avatar')['default']
     BranchCard: typeof import('./src/components/branch/BranchCard.vue')['default']
     BranchCreateDialog: typeof import('./src/components/branch/BranchCreateDialog.vue')['default']
@@ -61,7 +62,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Select: typeof import('primevue/select')['default']
-    SidebarSettings: typeof import('./src/components/app-menu/SidebarSettings.vue')['default']
+    Sidebar: typeof import('primevue/sidebar')['default']
+    SidebarSettings: typeof import('./src/components/app-sidebar/SidebarSettings.vue')['default']
     SidebarUserInfo: typeof import('./src/components/app-menu/SidebarUserInfo.vue')['default']
     StaffCard: typeof import('./src/components/staff/StaffCard.vue')['default']
     StaffCreateDialog: typeof import('./src/components/staff/StaffCreateDialog.vue')['default']
