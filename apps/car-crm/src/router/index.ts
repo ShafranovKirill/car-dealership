@@ -12,10 +12,26 @@ const router = createRouter({
     },
 
     {
-      path: "/:branchAlias",
+      path: "/:pathMatch(.*)*",
       component: () => import("../layouts/DashboardLayout.vue"),
       meta: { requiresAuth: true },
-      children: [],
+      children: [
+        {
+          path: "brands",
+          name: "brands",
+          component: () => import("../views/brands/BrandsView.vue"),
+        },
+        {
+          path: "models",
+          name: "models",
+          component: () => import("../views/models/ModelsView.vue"),
+        },
+        {
+          path: "appointments",
+          name: "appointments",
+          component: () => import("../views/appointments/AppointmentsView.vue"),
+        },
+      ],
     },
 
     {
