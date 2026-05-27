@@ -19,6 +19,17 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
+  app.enableCors({
+    origin: [
+      `http://localhost:${process.env.VITE_PORT_CRM || 4200}`,
+      `http://localhost:${process.env.VITE_PORT_WEB || 4300}`,
+    ],
+
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

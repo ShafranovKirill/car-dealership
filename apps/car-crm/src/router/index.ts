@@ -12,7 +12,8 @@ const router = createRouter({
     },
 
     {
-      path: "/:pathMatch(.*)*",
+      path: "/main",
+      name: "main",
       component: () => import("../layouts/DashboardLayout.vue"),
       meta: { requiresAuth: true },
       children: [

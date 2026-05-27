@@ -17,7 +17,7 @@ export async function authMiddleware(to: RouteLocationNormalized, _from: RouteLo
 
   if (guestOnly && isLoggedIn) {
     return {
-      name: "dashboard",
+      name: "main",
     };
   }
 
