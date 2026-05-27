@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useBrandStore } from '@/stores/brand.store';
 import { ImageHelper } from '@/utils/image.utils';
 import type { BrandResponse, CreateBrandRequest, UpdateBrandRequest } from '@car/types';
 import { PHOTO_KEYS } from '@car/common';
+import { SocketEvent } from '@car/types';
+import { socket } from '@/plugins/socket';
+
+import 'primeicons/primeicons.css';
 
 const store = useBrandStore();
 const newName = ref('');
@@ -13,6 +17,17 @@ const fileInputs = ref<{ [key: string]: HTMLInputElement }>({});
 
 onMounted(() => {
   store.fetchAll();
+
+  socket.on(SocketEvent.PHOTO_EDIT_RESULT, (data: { success: boolean; targetId: string }) => {
+    if (data.success) {
+      console.log('Фото успешно обновлено, обновляем список брендов');
+      store.fetchAll();
+    }
+  });
+});
+
+onUnmounted(() => {
+  socket.off(SocketEvent.PHOTO_EDIT_RESULT);
 });
 
 async function createBrand() {
@@ -25,6 +40,11 @@ async function createBrand() {
 function startEdit(b: any) {
   editingId.value = b.id;
   editingName.value = b.name;
+}
+
+function cancelEdit() {
+  editingId.value = null;
+  editingName.value = '';
 }
 
 async function saveEdit() {
@@ -41,16 +61,14 @@ async function remove(id: string) {
 }
 
 function getBrandUrl(brand: BrandResponse) {
-  return (
-    ImageHelper.getPhotoUrl(brand.images, PHOTO_KEYS.PHOTO_MD)
-  );
+  return ImageHelper.getPhotoUrl(brand.images, PHOTO_KEYS.PHOTO_MD);
 }
 
 async function onFileChange(brandId: string, e: Event) {
   const input = e.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
-  await store.uploadPhoto(brandId, file);
+  await store.uploadPhoto(brandId, file, socket.id || '');
   input.value = '';
 }
 
@@ -60,115 +78,203 @@ function openFileInput(brandId: string) {
 </script>
 
 <template>
-  <section class="p-6">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">Производители</h1>
-      <p class="text-gray-500">Управление брендами и их логотипами</p>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-      <div class="flex gap-3">
-        <input v-model="newName" placeholder="Название новой марки" class="flex-1 border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <button @click="createBrand" class="btn btn-primary">Добавить</button>
+  <section class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 antialiased text-gray-800">
+    <!-- Заголовок -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Производители</h1>
+        <p class="text-sm sm:text-base text-gray-500 mt-1">Управление брендами авто и их официальными логотипами</p>
       </div>
     </div>
 
-    <div v-if="store.isLoading" class="text-center py-8 text-gray-500">Загрузка...</div>
+    <!-- Форма добавления -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 mb-8 transition-all hover:shadow-md">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <input 
+            v-model="newName" 
+            placeholder="Название новой марки (например, BMW)" 
+            class="w-full border border-gray-300 pl-4 pr-4 py-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all text-sm" 
+            @keyup.enter="createBrand"
+          />
+        </div>
+        <button 
+          @click="createBrand" 
+          class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-sm hover:shadow transition-all whitespace-nowrap focus:ring-4 focus:ring-blue-100"
+        >
+          <i class="pi pi-plus text-xs"></i>
+          <span>Добавить бренд</span>
+        </button>
+      </div>
+    </div>
 
-    <div v-else class="bg-white rounded-lg shadow-md overflow-hidden">
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="text-left px-6 py-4 font-semibold text-gray-700">Логотип</th>
-            <th class="text-left px-6 py-4 font-semibold text-gray-700">Название</th>
-            <th class="text-left px-6 py-4 font-semibold text-gray-700">Действия</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="b in store.brands" :key="b.id" class="hover:bg-gray-50 transition-colors">
-            <td class="px-6 py-4">
-              <div class="flex flex-col gap-3">
-                <div class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                  <img v-if="getBrandUrl(b)" :src="getBrandUrl(b)!" class="h-full w-full object-contain p-2" />
-                  <div v-else class="text-sm text-gray-400">Нет логотипа</div>
-                </div>
-                <button v-if="editingId === b.id" @click="openFileInput(b.id)" class="px-3 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100 transition-colors font-medium border border-blue-200">
-                  📷 Сменить фото
-                </button>
-                <input :ref="el => el && (fileInputs[b.id] = el as HTMLInputElement)" type="file" @change="e => onFileChange(b.id, e)" class="hidden" />
+    <div v-if="store.isLoading" class="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
+      <i class="pi pi-spin pi-spinner text-blue-600 text-3xl mb-3"></i>
+      <span class="text-sm font-medium text-gray-500">Загрузка данных...</span>
+    </div>
+
+    <div v-else>
+      <div class="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-left">
+            <thead>
+              <tr class="bg-gray-50/75 border-b border-gray-100">
+                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 w-32">Логотип</th>
+                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Название</th>
+                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right w-48">Действия</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr v-for="b in store.brands" :key="b.id" class="hover:bg-gray-50/50 transition-colors group">
+                
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div 
+                    @click="openFileInput(b.id)"
+                    class="relative w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden group/thumb shadow-inner cursor-pointer border border-gray-100"
+                  >
+                    <img 
+                      v-if="getBrandUrl(b)" 
+                      :src="getBrandUrl(b)!" 
+                      class="h-full w-full object-contain p-2 transition-transform duration-300 group-hover/thumb:scale-105" 
+                      alt="Logo"
+                    />
+                    <div v-else class="flex flex-col items-center text-[10px] text-gray-400 font-medium p-1 text-center">
+                      <i class="pi pi-image text-lg mb-0.5 text-gray-300"></i>
+                      <span>Нажмите,<br>чтобы добавить</span>
+                    </div>
+                    
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-1">
+                      <i class="pi pi-camera text-base"></i>
+                      <span class="text-[10px] font-medium tracking-wide">Изменить</span>
+                    </div>
+
+                    <input 
+                      :ref="el => el && (fileInputs[b.id] = el as HTMLInputElement)" 
+                      type="file" 
+                      accept="image/*"
+                      @change="e => onFileChange(b.id, e)" 
+                      class="hidden" 
+                    />
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 vertical-align-middle">
+                  <div v-if="editingId === b.id" class="max-w-xs">
+                    <input 
+                      v-model="editingName" 
+                      class="w-full border border-blue-400 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500/10 text-sm font-medium" 
+                      @keyup.enter="saveEdit"
+                      @keyup.esc="cancelEdit"
+                    />
+                  </div>
+                  <div v-else class="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {{ b.name }}
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <template v-if="editingId === b.id">
+                      <button @click="saveEdit" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Сохранить">
+                        <i class="pi pi-check text-sm font-bold"></i>
+                      </button>
+                      <button @click="cancelEdit" class="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Отмена">
+                        <i class="pi pi-times text-sm"></i>
+                      </button>
+                    </template>
+                    <template v-else>
+                      <button @click="startEdit(b)" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Редактировать название">
+                        <i class="pi pi-pencil text-sm"></i>
+                      </button>
+                      <button @click="remove(b.id)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Удалить производителя">
+                        <i class="pi pi-trash text-sm"></i>
+                      </button>
+                    </template>
+                  </div>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="block md:hidden space-y-3">
+        <div 
+          v-for="b in store.brands" 
+          :key="'mob-' + b.id" 
+          class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex items-center justify-between gap-4"
+        >
+          <div class="flex items-center gap-4 min-w-0 flex-1">
+            <div 
+              @click="openFileInput(b.id)"
+              class="relative w-16 h-16 bg-gray-50 rounded-xl flex shrink-0 items-center justify-center overflow-hidden border border-gray-200 shadow-inner active:scale-95 transition-transform"
+            >
+              <img 
+                v-if="getBrandUrl(b)" 
+                :src="getBrandUrl(b)!" 
+                class="h-full w-full object-contain p-1.5" 
+                alt="Logo"
+              />
+              <div v-else class="flex flex-col items-center text-[9px] text-gray-400 font-medium text-center p-0.5">
+                <i class="pi pi-image text-base text-gray-300"></i>
+                <span>Добавить</span>
               </div>
-            </td>
-            <td class="px-6 py-4">
-              <div v-if="editingId === b.id">
-                <input v-model="editingName" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              
+              <div class="absolute bottom-0 inset-x-0 bg-black/60 py-0.5 flex items-center justify-center text-white gap-1">
+                <i class="pi pi-camera text-[10px]"></i>
+                <span class="text-[9px] font-medium tracking-tight">Изменить</span>
               </div>
-              <div v-else class="text-gray-800 font-medium">{{ b.name }}</div>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex gap-2">
-                <button v-if="editingId !== b.id" @click="startEdit(b)" class="btn btn-secondary">Изменить</button>
-                <button v-if="editingId === b.id" @click="saveEdit" class="btn btn-success">Сохранить</button>
-                <button @click="remove(b.id)" class="btn btn-danger">Удалить</button>
+
+              <input 
+                :ref="el => el && (fileInputs[b.id] = el as HTMLInputElement)" 
+                type="file" 
+                accept="image/*"
+                @change="e => onFileChange(b.id, e)" 
+                class="hidden" 
+              />
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div v-if="editingId === b.id" class="w-full">
+                <input 
+                  v-model="editingName" 
+                  class="w-full border border-blue-400 px-2 py-1.5 rounded-lg focus:outline-none text-sm font-medium" 
+                  @keyup.enter="saveEdit"
+                  @keyup.esc="cancelEdit"
+                />
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <div v-else class="text-base font-semibold text-gray-950 truncate">
+                {{ b.name }}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0">
+            <template v-if="editingId === b.id">
+              <button @click="saveEdit" class="w-9 h-9 flex items-center justify-center text-emerald-600 bg-emerald-50 active:bg-emerald-100 rounded-lg transition-colors">
+                <i class="pi pi-check text-sm font-bold"></i>
+              </button>
+              <button @click="cancelEdit" class="w-9 h-9 flex items-center justify-center text-gray-400 bg-gray-50 active:bg-gray-100 rounded-lg transition-colors">
+                <i class="pi pi-times text-sm"></i>
+              </button>
+            </template>
+            <template v-else>
+              <button @click="startEdit(b)" class="w-9 h-9 flex items-center justify-center text-gray-500 bg-gray-50 active:bg-blue-50 active:text-blue-600 rounded-lg transition-colors">
+                <i class="pi pi-pencil text-sm"></i>
+              </button>
+              <button @click="remove(b.id)" class="w-9 h-9 flex items-center justify-center text-gray-400 bg-gray-50 active:bg-red-50 active:text-red-600 rounded-lg transition-colors">
+                <i class="pi pi-trash text-sm"></i>
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="!store.brands?.length" class="text-center py-12 text-gray-400 text-sm bg-white rounded-xl border border-gray-100 shadow-sm mt-4">
+        <i class="pi pi-folder-open text-3xl mb-2 block text-gray-300"></i>
+        Список производителей пуст
+      </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-.btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border: none;
-  font-size: 14px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2b6cb0 100%);
-  color: white;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-.btn-secondary {
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-}
-
-.btn-secondary:hover {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-.btn-success {
-  background-color: #10b981;
-  color: white;
-}
-
-.btn-success:hover {
-  background-color: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-}
-
-.btn-danger {
-  background-color: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-}
-</style>

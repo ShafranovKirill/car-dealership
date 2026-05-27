@@ -13,8 +13,8 @@ export const useBrandStore = defineStore("brand", {
       this.isLoading = true;
       try {
         const { data } = await api.get<BrandResponse[]>("/admin/brand/all");
-        this.brands = data;
-        return data;
+        this.brands = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return this.brands;
       } finally {
         this.isLoading = false;
       }
@@ -38,13 +38,13 @@ export const useBrandStore = defineStore("brand", {
       this.brands = this.brands.filter(b => b.id !== brandId);
     },
 
-    async uploadPhoto(brandId: string, file: File) {
+    async uploadPhoto(brandId: string, file: File, socketId: string) {
       const fd = new FormData();
       fd.append("file", file);
       await api.post(`/admin/brand/${brandId}/photo`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
+        params: { socketId },
       });
-      // refresh list to get updated images
       await this.fetchAll();
     },
   },
