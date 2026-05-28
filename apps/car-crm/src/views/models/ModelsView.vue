@@ -6,8 +6,7 @@ import type { CarModelResponse, CreateCarModelRequest, UpdateCarModelRequest } f
 import { PHOTO_KEYS } from '@car/common';
 import { SocketEvent } from '@car/types';
 import { socket } from '@/plugins/socket';
-import ModelCard from './components/ModelCard.vue';
-import ModelModal from './components/ModelModal.vue';
+
 
 const store = useModelStore();
 const brandStore = useBrandStore();
