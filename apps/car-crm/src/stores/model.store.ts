@@ -36,5 +36,20 @@ export const useModelStore = defineStore("model", {
       await api.delete(`/admin/model/delete/${modelId}`);
       this.models = this.models.filter(m => m.id !== modelId);
     },
+
+    async uploadPhoto(modelId: string, file: File, socketId: string) {
+      const fd = new FormData();
+      fd.append("file", file);
+      await api.post(`/admin/model/${modelId}/photo`, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+        params: { socketId },
+      });
+      await this.fetchAll();
+    },
+
+    async deletePhoto(modelId: string, fileKey: string) {
+      await api.delete(`/admin/model/${modelId}/photo`, { params: { fileKey } });
+      await this.fetchAll();
+    },
   },
 });
