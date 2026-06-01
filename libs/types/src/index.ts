@@ -3,3 +3,4 @@ export * from "./event/socket.event.js";
 export * from "./catalog/brand.js";
 export * from "./catalog/model.js";
 export * from "./catalog/configuration.js";
+export * from "./catalog/drive-test.js";

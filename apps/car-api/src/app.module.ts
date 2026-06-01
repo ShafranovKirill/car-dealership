@@ -13,6 +13,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { ConfigurationModule } from './catalog/configuration/configuration.module.js';
 import { BrandModule } from './catalog/brand/brand.module.js';
 import { ModelModule } from './catalog/model/model.module.js';
+import { TestingModule } from '@nestjs/testing';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ModelModule } from './catalog/model/model.module.js';
     ConfigurationModule,
     BrandModule,
     ModelModule,
+    TestingModule,
     ClsModule.forRoot({
       global: true,
       middleware: { mount: true },

@@ -53,8 +53,9 @@ model CarModel {
 
   configurations Configuration[] // Комплектация автомобиля
 
-  createdAt DateTime @default(now()) @map("created_at") // Дата добавления записи в базу
-  updatedAt DateTime @updatedAt @map("updated_at") // Дата последнего обновления записи
+  createdAt  DateTime    @default(now()) @map("created_at") // Дата добавления записи в базу
+  updatedAt  DateTime    @updatedAt @map("updated_at") // Дата последнего обновления записи
+  driveTests DriveTest[]
 
   @@map("car_models") // Имя таблицы в БД
 }
@@ -103,6 +104,22 @@ model MediaFile {
   @@map("media_files")
 }
 
+model DriveTest {
+  id          String          @id @default(uuid())
+  clientPhone String          @map("client_phone")
+  status      DriveTestStatus @default(NEW)
+
+  carModelId String   @map("car_model_id")
+  carModel   CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime? @map("scheduled_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("drive_tests")
+}
+
 enum BodyType {
   SEDAN
   HATCHBACK
@@ -143,4 +160,10 @@ enum DriveType {
   FWD
   RWD
   AWD
+}
+
+enum DriveTestStatus {
+  NEW
+  CONFIRMED
+  CANCELED
 }
