@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -17,16 +18,25 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TestingService } from './testing.service.js';
+import { CreateDriveTestRequestDto } from './dto/create.dto.js';
 import { UpdateDriveTestRequestDto } from './dto/update.dto.js';
 import { ReadDriveTestDto } from './dto/read.dto.js';
 import { JwtStaffAuthGuard } from '../identify/index.js';
 
 @ApiTags('Admin test drive (Запись на тест-драйв - админ)')
-@Controller('admin/test-drive')
+@Controller('admin/drive-test')
 @ApiBearerAuth('staff-auth')
 @UseGuards(JwtStaffAuthGuard)
 export class AdminTestingController {
   constructor(private readonly service: TestingService) {}
+
+  @Post('create')
+  @ApiOperation({ summary: 'Создать запись на тест-драйв (админ)' })
+  async create(
+    @Body() dto: CreateDriveTestRequestDto,
+  ): Promise<ReadDriveTestDto> {
+    return this.service.create(dto);
+  }
 
   @Get('all')
   @ApiOperation({
@@ -49,7 +59,7 @@ export class AdminTestingController {
     return this.service.findById(testDriveId);
   }
 
-  @Patch()
+  @Patch('update')
   @ApiOperation({ summary: 'Обновить запись на тест-драйв (админ)' })
   async update(
     @Body() dto: UpdateDriveTestRequestDto,
@@ -57,7 +67,7 @@ export class AdminTestingController {
     return this.service.update(dto);
   }
 
-  @Delete(':testDriveId')
+  @Delete('delete/:testDriveId')
   @ApiOperation({ summary: 'Удалить запись на тест-драйв (админ)' })
   async delete(@Param('testDriveId') testDriveId: string): Promise<void> {
     return this.service.delete(testDriveId);

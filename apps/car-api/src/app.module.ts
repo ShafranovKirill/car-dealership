@@ -13,7 +13,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { ConfigurationModule } from './catalog/configuration/configuration.module.js';
 import { BrandModule } from './catalog/brand/brand.module.js';
 import { ModelModule } from './catalog/model/model.module.js';
-import { TestingModule } from '@nestjs/testing';
+import { TestingModule } from './testing/testing.module.js';
 
 @Module({
   imports: [

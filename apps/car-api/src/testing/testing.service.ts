@@ -31,6 +31,13 @@ export class TestingService {
       skip,
       take,
       orderBy: { createdAt: 'desc' },
+      include: {
+        carModel: {
+          include: {
+            brand: true,
+          },
+        },
+      },
     });
 
     return driveTests.map((item) => toDto(item, ReadDriveTestDto));
@@ -39,6 +46,13 @@ export class TestingService {
   async findById(testDriveId: string): Promise<ReadDriveTestDto> {
     const driveTest = await this.prisma.driveTest.findUnique({
       where: { id: testDriveId },
+      include: {
+        carModel: {
+          include: {
+            brand: true,
+          },
+        },
+      },
     });
 
     if (!driveTest) {
@@ -52,9 +66,19 @@ export class TestingService {
 
   async create(dto: CreateDriveTestRequestDto): Promise<ReadDriveTestDto> {
     try {
+      const scheduledAt = this.getValidatedScheduledAt(dto.scheduledAt);
+
       const driveTest = await this.prisma.driveTest.create({
         data: {
           ...dto,
+          scheduledAt,
+        },
+        include: {
+          carModel: {
+            include: {
+              brand: true,
+            },
+          },
         },
       });
 
@@ -67,11 +91,20 @@ export class TestingService {
   async update(dto: UpdateDriveTestRequestDto): Promise<ReadDriveTestDto> {
     try {
       const { driveTestId, ...updateData } = dto;
+      const scheduledAt = this.getValidatedScheduledAt(updateData.scheduledAt);
 
       const driveTest = await this.prisma.driveTest.update({
         where: { id: driveTestId },
         data: {
           ...updateData,
+          scheduledAt,
+        },
+        include: {
+          carModel: {
+            include: {
+              brand: true,
+            },
+          },
         },
       });
 
@@ -79,6 +112,25 @@ export class TestingService {
     } catch (error) {
       this.handleTestingConstraintError(error);
     }
+  }
+
+  private getValidatedScheduledAt(
+    scheduledAt?: string | Date | null,
+  ): Date | null | undefined {
+    if (scheduledAt === undefined) {
+      return undefined;
+    }
+
+    if (scheduledAt === null) {
+      return null;
+    }
+
+    const value = new Date(scheduledAt);
+    if (Number.isNaN(value.getTime())) {
+      throw new BadRequestException('Invalid scheduledAt date-time');
+    }
+
+    return value;
   }
 
   async delete(testDriveId: string): Promise<void> {

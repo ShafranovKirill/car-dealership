@@ -1,14 +1,8 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { CreateDriveTestRequestDto } from './create.dto.js';
 import { UpdateDriveTestRequest } from '@car/types';
-import { DriveTestStatus } from '../../generated/prisma/enums.js';
+import { DriveTestStatus } from '../../../generated/prisma/client.js';
 
 export class UpdateDriveTestRequestDto
   extends PartialType(CreateDriveTestRequestDto)
