@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import type { ConfigurationResponse } from '@car/types';
 import { ImageHelper } from '@/utils/image.utils';
+import { PHOTO_KEYS } from '@car/common';
+
+function getFirstPhoto(photos: Record<string, any> | null | undefined, key: string): string | null {
+  if (!photos) return null;
+  const value = photos[key];
+  if (!value) return null;
+  if (Array.isArray(value)) return value[0] || null;
+  if (typeof value === 'string') return value;
+  return null;
+}
 
 const props = defineProps<{
   configurations: ConfigurationResponse[];
@@ -48,8 +58,8 @@ function confirmDelete(configId: string) {
           <!-- Photo Thumbnail -->
           <div class="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
             <img
-              v-if="config.images?.['photo-md']"
-              :src="ImageHelper.generatePublicUrl(config.images['photo-md']) || ''"
+              v-if="getFirstPhoto(config.images, PHOTO_KEYS.PHOTO_MD)"
+              :src="ImageHelper.generatePublicUrl(getFirstPhoto(config.images, PHOTO_KEYS.PHOTO_MD)) || ''"
               class="h-full w-full object-cover"
             />
             <div v-else class="flex h-full items-center justify-center text-xs text-gray-400">

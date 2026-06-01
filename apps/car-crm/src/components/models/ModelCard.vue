@@ -105,16 +105,11 @@ async function saveConfiguration(payload: any) {
 
 async function uploadConfigPhoto(payload: { configurationId: string; file: File; photoKey: string }) {
   try {
-    await configStore.uploadPhoto(payload.configurationId, payload.file);
-    // Reload configuration after photo upload
-    const updatedConfig = await configStore.fetchOne(payload.configurationId);
-    const index = configurations.value.findIndex(c => c.id === payload.configurationId);
-    if (index !== -1) {
-      configurations.value[index] = updatedConfig;
-    }
-    // Reload editing config if it's the one being edited
+    // Trigger upload; processing/conversion is performed asynchronously on server
+    await configStore.uploadPhoto(payload.configurationId, payload.file, socket.id || '');
+    // Keep modal open and wait for socket event to refresh configurations when processing completes
     if (editingConfig.value?.id === payload.configurationId) {
-      editingConfig.value = updatedConfig;
+      showConfigModal.value = true;
     }
   } catch (error) {
     console.error('Failed to upload configuration photo:', error);
@@ -209,6 +204,14 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
     <transition name="fade">
       <div v-if="expanded" class="mt-4 border-t border-gray-200 pt-4 text-sm sm:text-sm text-gray-600">
         <div class="space-y-4">
+          <div class="mt-2">
+            <PhotoSlider
+              :photos="photoKeys"
+              @delete="removePhoto"
+              @upload="(file: any) => $emit('upload-photo', { modelId: model.id, file })"
+            />
+          </div>
+
           <div>
             <div class="text-sm font-semibold text-gray-800 mb-2">Общее</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -245,14 +248,6 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
               <div><span class="font-medium">Трансмиссия:</span> {{ model.transmission }}</div>
               <div><span class="font-medium">Привод:</span> {{ model.driveType }}</div>
             </div>
-          </div>
-
-          <div class="mt-2">
-            <PhotoSlider
-              :photos="photoKeys"
-              @delete="removePhoto"
-              @upload="(file: any) => $emit('upload-photo', { modelId: model.id, file })"
-            />
           </div>
 
           <div class="mt-4">

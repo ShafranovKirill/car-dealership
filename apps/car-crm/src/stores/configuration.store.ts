@@ -42,7 +42,6 @@ export const useConfigurationStore = defineStore("configuration", {
 
     async create(dto: CreateConfigurationRequest) {
       const { data } = await api.post<ConfigurationResponse>("/admin/configuration/create", dto);
-      this.items.push(data);
       return data;
     },
 
@@ -58,17 +57,16 @@ export const useConfigurationStore = defineStore("configuration", {
       this.items = this.items.filter(i => i.id !== configurationId);
     },
 
-    async uploadPhoto(configurationId: string, file: File) {
+    async uploadPhoto(configurationId: string, file: File, socketId?: string) {
       const formData = new FormData();
       formData.append("file", file);
-      const { data } = await api.post<ConfigurationResponse>(
-        `/admin/configuration/${configurationId}/photo`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
-      );
-      const idx = this.items.findIndex(i => i.id === configurationId);
-      if (idx !== -1) this.items.splice(idx, 1, data);
-      return data;
+      // The upload endpoint triggers async processing and emits socket event
+      await api.post(`/admin/configuration/${configurationId}/photo`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        params: { socketId },
+      });
+      // Do not return configuration data here — processing is asynchronous
+      return;
     },
 
     async deletePhoto(configurationId: string, photoKey: string) {
