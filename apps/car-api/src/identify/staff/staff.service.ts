@@ -29,6 +29,7 @@ import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { LoginStaffDto } from './dto/login.dto.js';
 import { Response } from 'express';
 import { UpdateStaffDto } from './dto/update.dto.js';
+import { isDev, isProd } from '../../utils/env.js';
 
 @Injectable()
 export class StaffService {
@@ -301,6 +302,16 @@ export class StaffService {
       sameSite: 'strict',
       path: '/',
       maxAge: refreshMaxAge,
+    });
+  }
+
+  clearRefreshTokenCookie(res: Response): void {
+    res.cookie(COOKIE_NAMES.STAFF_REFRESH_TOKEN, '', {
+      expires: new Date(0),
+      httpOnly: true,
+      path: '/',
+      secure: isProd(),
+      sameSite: isDev() ? 'lax' : 'none',
     });
   }
 

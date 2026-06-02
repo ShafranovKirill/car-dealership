@@ -16,11 +16,17 @@ const router = createRouter({
       name: "main",
       component: () => import("../layouts/DashboardLayout.vue"),
       meta: { requiresAuth: true },
+      redirect: { name: "dashboard-home" },
       children: [
         {
           path: "brands",
           name: "brands",
           component: () => import("../views/brands/BrandsView.vue"),
+        },
+        {
+          path: "",
+          name: "dashboard-home",
+          component: () => import("../views/dashboard/AdminHomeView.vue"),
         },
         {
           path: "models",
@@ -39,11 +45,6 @@ const router = createRouter({
       path: "/:pathMatch(.*)*",
       name: "not-found",
       component: () => import("@/views/errors/NotFoundView.vue"),
-    },
-    {
-      path: "/",
-      name: "root",
-      component: () => import("../views/auth/LoginView.vue"),
     },
   ],
 });

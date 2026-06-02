@@ -84,6 +84,9 @@
     "updateSuccess": "Brand successfully updated",
     "updateError": "Error updating the brand"
   },
+  "brands_select": {
+    "placeholder": "Select brand..."
+  },
   "models": {
     "title": "Models",
     "subtitle": "Managing car models and configurations",
@@ -97,6 +100,9 @@
     "updateError": "Error updating the model",
     "deleteConfiguration": "Delete configuration",
     "keyError": "Failed to determine the file key for deletion"
+  },
+  "models_select": {
+    "placeholder": "Select model..."
   },
   "appointments": {
     "title": "Appointments",
@@ -124,6 +130,9 @@
     "statusConfirmed": "Confirmed",
     "statusCanceled": "Canceled"
   },
+  "appointments_select": {
+    "selectBrandToSeeModels": "Select a brand to see models"
+  },
   "dashboard": {
     "brands": "Brands",
     "models": "Models",
@@ -135,5 +144,21 @@
     "darkTheme": "Dark theme",
     "english": "English",
     "russian": "Русский"
+  },
+
+  "dashboard_extra": {
+    "welcome": "Welcome, admin!",
+    "subtitle": "Choose a section from the left or use quick actions",
+    "msg1": "Manage the fleet with ease",
+    "msg2": "Quick admin actions",
+    "msg3": "New appointments await confirmation",
+    "hint": "Click a button for quick access",
+    "quickAction": "Create brand",
+    "quickActionDesc": "Add a new brand to the catalog",
+    "quickAction2": "Add model",
+    "quickAction2Desc": "Create a model for a selected brand",
+    "quickAction3": "View appointments",
+    "quickAction3Desc": "Process new appointments quickly",
+    "go": "Go"
   }
 }

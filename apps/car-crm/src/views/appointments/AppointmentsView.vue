@@ -308,7 +308,7 @@ function getRowClass(test: any) {
               @change="onBrandChange"
               class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             >
-              <option value="">Выберите марку...</option>
+              <option value="">{{ t('brands_select.placeholder') }}</option>
               <option v-for="brand in brandStore.brands" :key="brand.id" :value="brand.id">
                 {{ brand.name }}
               </option>
@@ -322,14 +322,14 @@ function getRowClass(test: any) {
               required
               class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             >
-              <option value="">Выберите модель...</option>
+              <option value="">{{ t('models_select.placeholder') }}</option>
               <option v-for="model in availableModels" :key="model.id" :value="model.id">
                 {{ model.name }}
               </option>
             </select>
           </div>
           <div v-else class="text-sm text-gray-500">
-            <p>{{ 'Выберите марку, чтобы увидеть модели' }}</p>
+            <p>{{ t('appointments_select.selectBrandToSeeModels') }}</p>
           </div>
 
           <div>
@@ -355,7 +355,7 @@ function getRowClass(test: any) {
                 'flex-1 px-4 py-2 rounded-lg transition-colors font-medium',
                 newForm.carModelId && newForm.clientPhone.trim()
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-200 cursor-not-allowed'
               ]"
             >
               {{ t('configuration.create') }}

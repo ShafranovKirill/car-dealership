@@ -33,7 +33,7 @@ const handleLogin = async () => {
       life: 3000,
     });
 
-    router.push({ name: "main" });
+    router.push({ name: "dashboard-home" });
   } catch (error) {
     let errorMessage = t("auth.login_error");
 

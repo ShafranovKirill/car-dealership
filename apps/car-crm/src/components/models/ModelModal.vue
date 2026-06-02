@@ -131,113 +131,113 @@ function onSave() {
       <div class="p-4 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto flex-1">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Название *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.name') }} *</label>
             <input v-model="form.name" type="text" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Поколение</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.generation') }}</label>
             <input v-model="form.generation" type="text" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Год от</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.year') }}</label>
             <input v-model.number="form.yearFrom" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Бренд *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.brand') }} *</label>
             <select v-model="form.brandId" class="input w-full">
-              <option value="">Выберите бренд</option>
+              <option value="">{{ t('model.selectBrand') }}</option>
               <option v-for="brand in props.brands" :key="brand.id" :value="brand.id">{{ brand.name }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Тип кузова</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.bodyType') }}</label>
             <select v-model="form.bodyType" class="input w-full">
               <option v-for="type in BODY_TYPES" :key="type" :value="type">{{ type }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Класс</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.class') }}</label>
             <select v-model="form.carClass" class="input w-full">
               <option v-for="carClass in CAR_CLASSES" :key="carClass" :value="carClass">{{ carClass }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Мин. цена (₽)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.minPrice') }} (₽)</label>
             <input v-model.number="form.minPrice" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Длина (мм)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.length') }} (мм)</label>
             <input v-model.number="form.length" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ширина (мм)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.width') }} (мм)</label>
             <input v-model.number="form.width" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Высота (мм)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.height') }} (мм)</label>
             <input v-model.number="form.height" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Колесная база (мм)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.wheelbase') }} (мм)</label>
             <input v-model.number="form.wheelbase" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Клиренс (мм)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.clearance') }} (мм)</label>
             <input v-model.number="form.clearance" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Объем багажника (л)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.trunkVolume') }} (л)</label>
             <input v-model.number="form.trunkVolume" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Тип двигателя</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.engineType') }}</label>
             <select v-model="form.engineType" class="input w-full">
               <option v-for="engineType in ENGINE_TYPES" :key="engineType" :value="engineType">{{ engineType }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Объем двигателя (л)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.engineVolume') }} (л)</label>
             <input v-model.number="form.engineVolume" type="number" step="0.1" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Мощность (л.с.)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.enginePower') }} (л.с.)</label>
             <input v-model.number="form.enginePower" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Крутящий момент (Нм)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.engineTorque') }} (Нм)</label>
             <input v-model.number="form.engineTorque" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Цилиндров</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.cylinders') }}</label>
             <input v-model.number="form.cylindersCount" type="number" class="input w-full" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Коробка передач</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.transmission') }}</label>
             <select v-model="form.transmission" class="input w-full">
               <option v-for="transmission in TRANSMISSIONS" :key="transmission" :value="transmission">{{ transmission }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Привод</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('model.drive') }}</label>
             <select v-model="form.driveType" class="input w-full">
               <option v-for="driveType in DRIVE_TYPES" :key="driveType" :value="driveType">{{ driveType }}</option>
             </select>
@@ -245,12 +245,12 @@ function onSave() {
         </div>
       </div>
 
-      <div class="sticky bottom-0 p-4 sm:p-6 border-t border-gray-200 flex gap-2 sm:gap-3 justify-end bg-white">
+        <div class="sticky bottom-0 p-4 sm:p-6 border-t border-gray-200 flex gap-2 sm:gap-3 justify-end bg-white">
         <button @click="onClose" class="px-3 sm:px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm sm:text-base">
-          Отменить
+          {{ t('configuration.cancel') }}
         </button>
         <button @click="onSave" :disabled="loading" class="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400 text-sm sm:text-base">
-          {{ loading ? (props.mode === 'edit' ? 'Сохранение...' : 'Создание...') : (props.mode === 'edit' ? 'Сохранить' : 'Создать') }}
+          {{ loading ? (props.mode === 'edit' ? t('configuration.saving') : t('configuration.creating')) : (props.mode === 'edit' ? t('configuration.save') : t('configuration.create')) }}
         </button>
       </div>
     </div>
