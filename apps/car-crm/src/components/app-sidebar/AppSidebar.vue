@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const visible = defineModel('visible', { type: Boolean, default: false })
 const router = useRouter()
-const menuItems = ref([
+const menuItems = computed(() => [
   {
     label: t('dashboard.brands'),
     icon: 'pi pi-list',
