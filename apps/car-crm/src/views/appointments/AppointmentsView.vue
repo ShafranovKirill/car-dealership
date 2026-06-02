@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useDriveTestStore } from '@/stores/drive-test.store';
 import { useModelStore } from '@/stores/model.store';
 import { useBrandStore } from '@/stores/brand.store';
 import type { CreateDriveTestRequest, UpdateDriveTestRequest } from '@/stores/drive-test.store';
+
+const { t } = useI18n();
 
 const driveTestStore = useDriveTestStore();
 const modelStore = useModelStore();
@@ -64,7 +67,7 @@ function resetNewForm() {
 
 async function createDriveTest() {
   if (!newForm.value.clientPhone.trim() || !newForm.value.carModelId || !selectedBrandId.value) {
-    alert('Заполните все обязательные поля');
+    alert(t('appointments.requiredFields'));
     return;
   }
 
@@ -73,8 +76,8 @@ async function createDriveTest() {
     showCreateDialog.value = false;
     resetNewForm();
   } catch (error) {
-    console.error('Ошибка при создании заявки:', error);
-    alert('Ошибка при создании заявки');
+    console.error(t('appointments.createError'), error);
+    alert(t('appointments.createError'));
   }
 }
 
@@ -98,18 +101,18 @@ async function updateDriveTest() {
     showUpdateDialog.value = false;
     editingTest.value = null;
   } catch (error) {
-    console.error('Ошибка при обновлении заявки:', error);
-    alert('Ошибка при обновлении заявки');
+    console.error(t('appointments.updateError'), error);
+    alert(t('appointments.updateError'));
   }
 }
 
 async function removeDriveTest(id: string) {
-  if (!confirm('Удалить заявку на тест-драйв?')) return;
+  if (!confirm(t('appointments.deleteConfirm'))) return;
   try {
     await driveTestStore.remove(id);
   } catch (error) {
-    console.error('Ошибка при удалении заявки:', error);
-    alert('Ошибка при удалении заявки');
+    console.error(t('appointments.deleteError'), error);
+    alert(t('appointments.deleteError'));
   }
 }
 
@@ -129,11 +132,11 @@ function getStatusBadgeClass(status: string) {
 function getStatusText(status: string) {
   switch (status) {
     case 'NEW':
-      return 'Новая';
+      return t('appointments.statusNew');
     case 'CONFIRMED':
-      return 'Подтверждена';
+      return t('appointments.statusConfirmed');
     case 'CANCELED':
-      return 'Отменена';
+      return t('appointments.statusCanceled');
     default:
       return status;
   }
@@ -145,7 +148,7 @@ function getCarModelName(test: any) {
     const brandName = brand?.name || '';
     return `${brandName} ${test.carModel.name}`.trim();
   }
-  return 'Неизвестная модель';
+  return t('appointments.carModel');
 }
 
 function formatDate(dateString: string | null | undefined) {
@@ -173,14 +176,14 @@ function getRowClass(test: any) {
     <!-- Заголовок -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Заявки на тест-драйв</h1>
-        <p class="text-sm sm:text-base text-gray-500 mt-1">Управление заявками и расписание тест-драйвов</p>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">{{ t('appointments.title') }}</h1>
+        <p class="text-sm sm:text-base text-gray-500 mt-1">{{ t('appointments.subtitle') }}</p>
       </div>
       <button
         @click="showCreateDialog = true"
         class="px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
       >
-        + Новая заявка
+        + {{ t('appointments.create') }}
       </button>
     </div>
 
@@ -198,16 +201,16 @@ function getRowClass(test: any) {
         ]"
       >
         <span v-if="tab === 'all'">
-          Все ({{ driveTestStore.driveTests.length }})
+          {{ t('appointments.all') }} ({{ driveTestStore.driveTests.length }})
         </span>
         <span v-else-if="tab === 'new'">
-          Новые ({{ driveTestStore.newDriveTests.length }})
+          {{ t('appointments.new') }} ({{ driveTestStore.newDriveTests.length }})
         </span>
         <span v-else-if="tab === 'confirmed'">
-          Подтверждены ({{ driveTestStore.confirmedDriveTests.length }})
+          {{ t('appointments.confirmed') }} ({{ driveTestStore.confirmedDriveTests.length }})
         </span>
         <span v-else-if="tab === 'canceled'">
-          Отменены ({{ driveTestStore.canceledDriveTests.length }})
+          {{ t('appointments.canceled') }} ({{ driveTestStore.canceledDriveTests.length }})
         </span>
       </button>
     </div>
@@ -218,12 +221,12 @@ function getRowClass(test: any) {
         <table class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Статус</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Номер телефона</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Модель</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">{{ t('appointments.status') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">{{ t('appointments.clientPhone') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">{{ t('appointments.carModel') }}</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Дата создания</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Запланирована</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Действия</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">{{ t('appointments.scheduledAt') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">{{ t('common.edit') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -247,13 +250,13 @@ function getRowClass(test: any) {
                   @click="openUpdateDialog(test)"
                   class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                 >
-                  Редактировать
+                  {{ t('common.edit') }}
                 </button>
                 <button
                   @click="removeDriveTest(test.id)"
                   class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
                 >
-                  Удалить
+                  {{ t('common.delete') }}
                 </button>
               </div>
             </td>
@@ -268,7 +271,7 @@ function getRowClass(test: any) {
       v-else
       class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center"
     >
-      <p class="text-gray-500">Нет заявок для отображения</p>
+      <p class="text-gray-500">{{ t('appointments.title') }}</p>
     </div>
 
     <!-- Диалог создания -->
@@ -278,7 +281,7 @@ function getRowClass(test: any) {
     >
       <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-900">Новая заявка на тест-драйв</h2>
+          <h2 class="text-xl font-bold text-gray-900">{{ t('appointments.create') }}</h2>
           <button
             @click="showCreateDialog = false; resetNewForm()"
             class="text-gray-500 hover:text-gray-700 text-2xl leading-none"
@@ -289,7 +292,7 @@ function getRowClass(test: any) {
 
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Номер телефона *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('appointments.clientPhone') }} *</label>
             <input
               v-model="newForm.clientPhone"
               type="tel"
@@ -299,7 +302,7 @@ function getRowClass(test: any) {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Марка автомобиля *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('brands.title') }} *</label>
             <select
               v-model="selectedBrandId"
               @change="onBrandChange"
@@ -312,11 +315,11 @@ function getRowClass(test: any) {
             </select>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Модель автомобиля *</label>
+          <div v-if="selectedBrandId">
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('appointments.carModel') }} *</label>
             <select
               v-model="newForm.carModelId"
-              :disabled="!selectedBrandId"
+              required
               class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             >
               <option value="">Выберите модель...</option>
@@ -325,9 +328,12 @@ function getRowClass(test: any) {
               </option>
             </select>
           </div>
+          <div v-else class="text-sm text-gray-500">
+            <p>{{ 'Выберите марку, чтобы увидеть модели' }}</p>
+          </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Дата и время (опционально)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('appointments.scheduledAt') }} (опционально)</label>
             <input
               v-model="newForm.scheduledAt"
               type="datetime-local"
@@ -340,13 +346,19 @@ function getRowClass(test: any) {
               @click="showCreateDialog = false; resetNewForm()"
               class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
-              Отмена
+              {{ t('configuration.cancel') }}
             </button>
             <button
               @click="createDriveTest"
-              class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              :disabled="!newForm.carModelId || !newForm.clientPhone.trim()"
+              :class="[
+                'flex-1 px-4 py-2 rounded-lg transition-colors font-medium',
+                newForm.carModelId && newForm.clientPhone.trim()
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              ]"
             >
-              Создать
+              {{ t('configuration.create') }}
             </button>
           </div>
         </div>
@@ -360,7 +372,7 @@ function getRowClass(test: any) {
     >
       <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-900">Редактирование заявки</h2>
+          <h2 class="text-xl font-bold text-gray-900">{{ t('appointments.edit') }}</h2>
           <button
             @click="showUpdateDialog = false"
             class="text-gray-500 hover:text-gray-700 text-2xl leading-none"
@@ -371,19 +383,19 @@ function getRowClass(test: any) {
 
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Статус</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('appointments.status') }}</label>
             <select
               v-model="updateForm.status"
               class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             >
-              <option value="NEW">Новая</option>
-              <option value="CONFIRMED">Подтверждена</option>
-              <option value="CANCELED">Отменена</option>
+              <option value="NEW">{{ t('appointments.statusNew') }}</option>
+              <option value="CONFIRMED">{{ t('appointments.statusConfirmed') }}</option>
+              <option value="CANCELED">{{ t('appointments.statusCanceled') }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Дата и время</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('appointments.scheduledAt') }}</label>
             <input
               v-model="updateForm.scheduledAt"
               type="datetime-local"
@@ -392,8 +404,8 @@ function getRowClass(test: any) {
           </div>
 
           <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-600">
-            <p><strong>Телефон:</strong> {{ editingTest?.clientPhone }}</p>
-            <p><strong>Модель:</strong> {{ getCarModelName(editingTest) }}</p>
+            <p><strong>{{ t('appointments.clientPhone') }}:</strong> {{ editingTest?.clientPhone }}</p>
+            <p><strong>{{ t('appointments.carModel') }}:</strong> {{ getCarModelName(editingTest) }}</p>
             <p><strong>Создана:</strong> {{ formatDate(editingTest?.createdAt) }}</p>
           </div>
 
@@ -402,13 +414,13 @@ function getRowClass(test: any) {
               @click="showUpdateDialog = false"
               class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
-              Отмена
+              {{ t('configuration.cancel') }}
             </button>
             <button
               @click="updateDriveTest"
               class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              Сохранить
+              {{ t('configuration.save') }}
             </button>
           </div>
         </div>

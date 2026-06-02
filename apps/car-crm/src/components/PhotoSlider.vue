@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { PropType } from 'vue';
 import { ImageHelper } from '@/utils/image.utils';
+  const { t } = useI18n();
 
 const props = defineProps({
   photos: {
@@ -78,12 +80,12 @@ function deletePhoto() {
           ›
         </button>
         <button @click="deletePhoto" class="absolute top-2 right-2 rounded-full bg-black/60 p-2 text-white text-xs hover:bg-black/80">
-          Удалить
+          {{ t('common.delete') }}
         </button>
       </div>
 
       <div v-else class="flex h-52 sm:h-64 items-center justify-center p-4 text-center text-sm text-gray-500">
-        Нет фотографий
+        {{ t('configuration.noPhotos') }}
       </div>
     </div>
 
@@ -106,7 +108,7 @@ function deletePhoto() {
         @click="openFileInput"
         class="inline-flex items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-600 hover:border-blue-500 hover:text-blue-700"
       >
-        + Загрузить
+        {{ '+ ' + t('common.upload') }}
       </button>
       <input ref="fileInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
     </div>

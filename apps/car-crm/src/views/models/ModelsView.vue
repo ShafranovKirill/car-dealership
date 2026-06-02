@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useModelStore } from '@/stores/model.store';
 import { useBrandStore } from '@/stores/brand.store';
 import type { CarModelResponse, CreateCarModelRequest, UpdateCarModelRequest } from '@car/types';
 import { PHOTO_KEYS } from '@car/common';
 import { SocketEvent } from '@car/types';
 import { socket } from '@/plugins/socket';
+
+const { t } = useI18n();
 
 
 const store = useModelStore();
@@ -73,10 +76,10 @@ async function deletePhoto(payload: { model: CarModelResponse; index: number }) 
   const originals = getPhotoArray((payload.model as any).images, PHOTO_KEYS.PRODUCT_ORIGINAL);
   const fileKey = originals[payload.index];
   if (!fileKey) {
-    alert('Не удалось определить ключ файла для удаления');
+    alert(t('models.keyError'));
     return;
   }
-  if (!confirm('Удалить фото?')) return;
+  if (!confirm(t('models.deleteConfiguration'))) return;
   await store.deletePhoto(payload.model.id, fileKey);
 }
 
@@ -94,11 +97,11 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
   <section class="max-w-6xl mx-auto p-2 sm:p-4 lg:p-8 antialiased text-gray-800">
     <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-xl sm:text-2xl font-bold">Модели автомобилей</h1>
-        <p class="text-xs sm:text-sm text-gray-500">Управление моделями, галереями и добавление новых</p>
+        <h1 class="text-xl sm:text-2xl font-bold">{{ t('models.title') }}</h1>
+        <p class="text-xs sm:text-sm text-gray-500">{{ t('models.subtitle') }}</p>
       </div>
       <button @click="openCreateModal" class="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base whitespace-nowrap">
-        + Создать модель
+        + {{ t('models.add') }}
       </button>
     </div>
 
@@ -113,10 +116,10 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
       @save="saveModel"
     />
 
-    <div v-if="store.isLoading" class="py-12 text-center">Загрузка...</div>
+    <div v-if="store.isLoading" class="py-12 text-center">{{ t('common.loading') }}</div>
 
     <div v-else>
-      <div v-if="!store.models.length" class="text-center py-12">Список моделей пуст</div>
+      <div v-if="!store.models.length" class="text-center py-12">{{ t('models.title') }}</div>
 
       <div v-else class="grid gap-3 sm:gap-4">
         <ModelCard

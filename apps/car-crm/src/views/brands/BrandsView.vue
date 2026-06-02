@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useBrandStore } from '@/stores/brand.store';
 import { ImageHelper } from '@/utils/image.utils';
 import type { BrandResponse, CreateBrandRequest, UpdateBrandRequest } from '@car/types';
@@ -8,6 +9,8 @@ import { SocketEvent } from '@car/types';
 import { socket } from '@/plugins/socket';
 
 import 'primeicons/primeicons.css';
+
+const { t } = useI18n();
 
 const store = useBrandStore();
 const newName = ref('');
@@ -20,7 +23,7 @@ onMounted(() => {
 
   socket.on(SocketEvent.PHOTO_EDIT_RESULT, (data: { success: boolean; targetId: string }) => {
     if (data.success) {
-      console.log('Фото успешно обновлено, обновляем список брендов');
+      console.log(t('brands.photoUpdated'));
       store.fetchAll();
     }
   });
@@ -56,7 +59,7 @@ async function saveEdit() {
 }
 
 async function remove(id: string) {
-  if (!confirm('Удалить производителя?')) return;
+  if (!confirm(t('brands.delete'))) return;
   await store.remove(id);
 }
 
@@ -82,8 +85,8 @@ function openFileInput(brandId: string) {
     <!-- Заголовок -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Производители</h1>
-        <p class="text-sm sm:text-base text-gray-500 mt-1">Управление брендами авто и их официальными логотипами</p>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">{{ t('brands.title') }}</h1>
+        <p class="text-sm sm:text-base text-gray-500 mt-1">{{ t('brands.subtitle') }}</p>
       </div>
     </div>
 
@@ -93,7 +96,7 @@ function openFileInput(brandId: string) {
         <div class="relative flex-1">
           <input 
             v-model="newName" 
-            placeholder="Название новой марки (например, BMW)" 
+            :placeholder="t('brands.placeholder')" 
             class="w-full border border-gray-300 pl-4 pr-4 py-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all text-sm" 
             @keyup.enter="createBrand"
           />
@@ -103,14 +106,14 @@ function openFileInput(brandId: string) {
           class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-sm hover:shadow transition-all whitespace-nowrap focus:ring-4 focus:ring-blue-100"
         >
           <i class="pi pi-plus text-xs"></i>
-          <span>Добавить бренд</span>
+          <span>{{ t('brands.add') }}</span>
         </button>
       </div>
     </div>
 
     <div v-if="store.isLoading" class="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
       <i class="pi pi-spin pi-spinner text-blue-600 text-3xl mb-3"></i>
-      <span class="text-sm font-medium text-gray-500">Загрузка данных...</span>
+      <span class="text-sm font-medium text-gray-500">{{ t('common.loading') }}</span>
     </div>
 
     <div v-else>
@@ -119,9 +122,9 @@ function openFileInput(brandId: string) {
           <table class="w-full border-collapse text-left">
             <thead>
               <tr class="bg-gray-50/75 border-b border-gray-100">
-                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 w-32">Логотип</th>
-                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Название</th>
-                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right w-48">Действия</th>
+                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 w-32">{{ t('brands.title') }}</th>
+                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ t('model.name') }}</th>
+                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right w-48">{{ t('common.edit') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -140,12 +143,12 @@ function openFileInput(brandId: string) {
                     />
                     <div v-else class="flex flex-col items-center text-[10px] text-gray-400 font-medium p-1 text-center">
                       <i class="pi pi-image text-lg mb-0.5 text-gray-300"></i>
-                      <span>Нажмите,<br>чтобы добавить</span>
+                      <span>{{ t('common.upload') }}</span>
                     </div>
                     
                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-1">
                       <i class="pi pi-camera text-base"></i>
-                      <span class="text-[10px] font-medium tracking-wide">Изменить</span>
+                      <span class="text-[10px] font-medium tracking-wide">{{ t('common.edit') }}</span>
                     </div>
 
                     <input 
@@ -175,18 +178,18 @@ function openFileInput(brandId: string) {
                 <td class="px-6 py-4 whitespace-nowrap text-right">
                   <div class="flex items-center justify-end gap-1.5">
                     <template v-if="editingId === b.id">
-                      <button @click="saveEdit" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Сохранить">
+                      <button @click="saveEdit" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" :title="t('configuration.save')">
                         <i class="pi pi-check text-sm font-bold"></i>
                       </button>
-                      <button @click="cancelEdit" class="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Отмена">
+                      <button @click="cancelEdit" class="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" :title="t('configuration.cancel')">
                         <i class="pi pi-times text-sm"></i>
                       </button>
                     </template>
                     <template v-else>
-                      <button @click="startEdit(b)" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Редактировать название">
+                      <button @click="startEdit(b)" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" :title="t('common.edit')">
                         <i class="pi pi-pencil text-sm"></i>
                       </button>
-                      <button @click="remove(b.id)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Удалить производителя">
+                      <button @click="remove(b.id)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" :title="t('common.delete')">
                         <i class="pi pi-trash text-sm"></i>
                       </button>
                     </template>
@@ -218,12 +221,12 @@ function openFileInput(brandId: string) {
               />
               <div v-else class="flex flex-col items-center text-[9px] text-gray-400 font-medium text-center p-0.5">
                 <i class="pi pi-image text-base text-gray-300"></i>
-                <span>Добавить</span>
+                <span>{{ t('common.upload') }}</span>
               </div>
               
               <div class="absolute bottom-0 inset-x-0 bg-black/60 py-0.5 flex items-center justify-center text-white gap-1">
                 <i class="pi pi-camera text-[10px]"></i>
-                <span class="text-[9px] font-medium tracking-tight">Изменить</span>
+                <span class="text-[9px] font-medium tracking-tight">{{ t('common.edit') }}</span>
               </div>
 
               <input 
@@ -273,7 +276,7 @@ function openFileInput(brandId: string) {
 
       <div v-if="!store.brands?.length" class="text-center py-12 text-gray-400 text-sm bg-white rounded-xl border border-gray-100 shadow-sm mt-4">
         <i class="pi pi-folder-open text-3xl mb-2 block text-gray-300"></i>
-        Список производителей пуст
+        {{ t('brands.subtitle') }}
       </div>
     </div>
   </section>

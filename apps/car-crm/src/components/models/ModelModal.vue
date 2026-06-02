@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { BrandResponse, CarModelResponse, CreateCarModelRequest } from '@car/types';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   visible: boolean;
@@ -43,7 +46,7 @@ const form = ref<Partial<CreateCarModelRequest>>({
   driveType: 'FWD',
 });
 
-const title = computed(() => (props.mode === 'edit' ? 'Редактировать модель' : 'Создать модель'));
+const title = computed(() => (props.mode === 'edit' ? t('model.edit') : t('model.create')));
 
 function resetForm() {
   form.value = {

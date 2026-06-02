@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { BrandResponse, CarModelResponse, CreateConfigurationRequest } from '@car/types';
 import { SocketEvent } from '@car/types';
 import { PHOTO_KEYS } from '@car/common';
@@ -27,6 +28,7 @@ const configurations = ref<any[]>([]);
 const configLoading = ref(false);
 
 const brandName = computed(() => props.brands.find(b => b.id === props.model.brandId)?.name || '—');
+const { t } = useI18n();
 
 // Load configurations when card is expanded
 async function loadConfigurations() {
@@ -56,7 +58,7 @@ function editConfig(config: any) {
 }
 
 async function deleteConfig(configId: string) {
-  if (!confirm('Вы уверены, что хотите удалить эту комплектацию?')) {
+  if (!confirm(t('configuration.confirmDelete'))) {
     return;
   }
   try {
@@ -190,13 +192,13 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
 
       <div class="flex flex-wrap items-center gap-2">
         <button @click="toggleExpanded" class="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900">
-          <span>{{ expanded ? 'Скрыть' : 'Показать' }}</span>
+          <span>{{ expanded ? t('common.hide') : t('common.show') }}</span>
           <svg :class="expanded ? 'rotate-180' : ''" class="h-4 w-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 9l6 6 6-6" />
           </svg>
         </button>
         <button @click="$emit('edit', model)" class="px-3 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
-          Редактировать
+          {{ t('common.edit') }}
         </button>
       </div>
     </div>
@@ -213,40 +215,40 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
           </div>
 
           <div>
-            <div class="text-sm font-semibold text-gray-800 mb-2">Общее</div>
+            <div class="text-sm font-semibold text-gray-800 mb-2">{{ t('model.general') }}</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div><span class="font-medium">Название:</span> {{ model.name }}</div>
-              <div><span class="font-medium">Бренд:</span> {{ brandName }}</div>
-              <div><span class="font-medium">Поколение:</span> {{ model.generation || '—' }}</div>
-              <div><span class="font-medium">Год:</span> {{ model.yearFrom }} {{ model.yearTo ? '- ' + model.yearTo : '' }}</div>
-              <div><span class="font-medium">Тип кузова:</span> {{ model.bodyType }}</div>
-              <div><span class="font-medium">Класс:</span> {{ model.carClass }}</div>
-              <div><span class="font-medium">Мин. цена:</span> {{ model.minPrice.toLocaleString('ru-RU') }} ₽</div>
+              <div><span class="font-medium">{{ t('model.name') }}:</span> {{ model.name }}</div>
+              <div><span class="font-medium">{{ t('model.brand') }}:</span> {{ brandName }}</div>
+              <div><span class="font-medium">{{ t('model.generation') }}:</span> {{ model.generation || '—' }}</div>
+              <div><span class="font-medium">{{ t('model.year') }}:</span> {{ model.yearFrom }} {{ model.yearTo ? '- ' + model.yearTo : '' }}</div>
+              <div><span class="font-medium">{{ t('model.bodyType') }}:</span> {{ model.bodyType }}</div>
+              <div><span class="font-medium">{{ t('model.class') }}:</span> {{ model.carClass }}</div>
+              <div><span class="font-medium">{{ t('model.minPrice') }}:</span> {{ model.minPrice.toLocaleString('ru-RU') }} ₽</div>
             </div>
           </div>
 
           <div>
-            <div class="text-sm font-semibold text-gray-800 mb-2">Габариты</div>
+            <div class="text-sm font-semibold text-gray-800 mb-2">{{ t('model.dimensions') }}</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div><span class="font-medium">Длина:</span> {{ model.length }} мм</div>
-              <div><span class="font-medium">Ширина:</span> {{ model.width }} мм</div>
-              <div><span class="font-medium">Высота:</span> {{ model.height }} мм</div>
-              <div><span class="font-medium">Колесная база:</span> {{ model.wheelbase }} мм</div>
-              <div><span class="font-medium">Клиренс:</span> {{ model.clearance }} мм</div>
-              <div><span class="font-medium">Объем багажника:</span> {{ model.trunkVolume }} л</div>
+              <div><span class="font-medium">{{ t('model.length') }}:</span> {{ model.length }} мм</div>
+              <div><span class="font-medium">{{ t('model.width') }}:</span> {{ model.width }} мм</div>
+              <div><span class="font-medium">{{ t('model.height') }}:</span> {{ model.height }} мм</div>
+              <div><span class="font-medium">{{ t('model.wheelbase') }}:</span> {{ model.wheelbase }} мм</div>
+              <div><span class="font-medium">{{ t('model.clearance') }}:</span> {{ model.clearance }} мм</div>
+              <div><span class="font-medium">{{ t('model.trunkVolume') }}:</span> {{ model.trunkVolume }} л</div>
             </div>
           </div>
 
           <div>
-            <div class="text-sm font-semibold text-gray-800 mb-2">Двигатель</div>
+            <div class="text-sm font-semibold text-gray-800 mb-2">{{ t('model.engine') }}</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div><span class="font-medium">Тип двигателя:</span> {{ model.engineType }}</div>
-              <div><span class="font-medium">Объем двигателя:</span> {{ model.engineVolume }} л</div>
-              <div><span class="font-medium">Мощность:</span> {{ model.enginePower }} л.с.</div>
-              <div><span class="font-medium">Крутящий момент:</span> {{ model.engineTorque }} Нм</div>
-              <div><span class="font-medium">Цилиндров:</span> {{ model.cylindersCount || '—' }}</div>
-              <div><span class="font-medium">Трансмиссия:</span> {{ model.transmission }}</div>
-              <div><span class="font-medium">Привод:</span> {{ model.driveType }}</div>
+              <div><span class="font-medium">{{ t('model.engineType') }}:</span> {{ model.engineType }}</div>
+              <div><span class="font-medium">{{ t('model.engineVolume') }}:</span> {{ model.engineVolume }} л</div>
+              <div><span class="font-medium">{{ t('model.enginePower') }}:</span> {{ model.enginePower }} л.с.</div>
+              <div><span class="font-medium">{{ t('model.engineTorque') }}:</span> {{ model.engineTorque }} Нм</div>
+              <div><span class="font-medium">{{ t('model.cylinders') }}:</span> {{ model.cylindersCount || '—' }}</div>
+              <div><span class="font-medium">{{ t('model.transmission') }}:</span> {{ model.transmission }}</div>
+              <div><span class="font-medium">{{ t('model.drive') }}:</span> {{ model.driveType }}</div>
             </div>
           </div>
 

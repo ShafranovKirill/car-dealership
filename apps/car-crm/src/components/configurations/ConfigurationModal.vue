@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ConfigurationResponse, CreateConfigurationRequest } from '@car/types';
 import { PHOTO_KEYS } from '@car/common';
 
@@ -23,7 +24,9 @@ const form = ref<Partial<CreateConfigurationRequest>>({
   description: '',
 });
 
-const title = computed(() => (props.mode === 'edit' ? 'Редактировать комплектацию' : 'Создать комплектацию'));
+const { t } = useI18n();
+
+const title = computed(() => (props.mode === 'edit' ? t('configuration.edit') : t('configuration.create')));
 
 function resetForm() {
   form.value = {
@@ -90,25 +93,25 @@ const photoKeys = computed(() =>
       <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
         <!-- Name -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Название *</label>
-          <input v-model="form.name" type="text" class="input w-full" placeholder="Стандарт, Люкс и т.д." />
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuration.name') }} {{ t('common.required') }}</label>
+          <input v-model="form.name" type="text" class="input w-full" :placeholder="t('configuration.namePlaceholder')" />
         </div>
 
         <!-- Price -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Цена (₽) *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuration.price') }} {{ t('common.required') }}</label>
           <input v-model.number="form.price" type="number" class="input w-full" />
         </div>
 
         <!-- Description -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Описание</label>
-          <textarea v-model="form.description" class="input w-full" rows="4" placeholder="Описание комплектации..."></textarea>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuration.description') }}</label>
+          <textarea v-model="form.description" class="input w-full" rows="4" :placeholder="t('configuration.descriptionPlaceholder')"></textarea>
         </div>
 
         <!-- Photos (only in edit mode) -->
         <div v-if="mode === 'edit' && configuration">
-          <label class="block text-sm font-medium text-gray-700 mb-3">Фотографии</label>
+          <label class="block text-sm font-medium text-gray-700 mb-3">{{ t('configuration.photos') }}</label>
           <PhotoSlider
             :photos="photoKeys"
             @delete="() => $emit('delete-photo', { configurationId: configuration!.id, photoKey: PHOTO_KEYS.PHOTO_MD })"
@@ -119,10 +122,10 @@ const photoKeys = computed(() =>
 
       <div class="sticky bottom-0 p-4 sm:p-6 border-t border-gray-200 flex gap-2 sm:gap-3 justify-end bg-white">
         <button @click="onClose" :disabled="loading" class="px-3 sm:px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm sm:text-base disabled:bg-gray-100">
-          Отменить
+          {{ t('configuration.cancel') }}
         </button>
         <button @click="onSave" :disabled="loading || !form.name || !form.price" class="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400 text-sm sm:text-base">
-          {{ loading ? (mode === 'edit' ? 'Сохранение...' : 'Создание...') : (mode === 'edit' ? 'Сохранить' : 'Создать') }}
+          {{ loading ? (mode === 'edit' ? t('configuration.saving') : t('configuration.creating')) : (mode === 'edit' ? t('configuration.save') : t('configuration.create')) }}
         </button>
       </div>
     </div>

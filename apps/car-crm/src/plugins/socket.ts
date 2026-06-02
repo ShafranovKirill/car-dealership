@@ -14,11 +14,11 @@ export const socket = io(import.meta.env.VITE_SOCKET_URL, {
 socket.on("connect", () => {
   socketState.connected = true;
   socketState.id = socket.id ?? "";
-  console.log("✅ Сокет подключен, ID:", socket.id);
+  console.log("✅ Socket connected, ID:", socket.id);
 });
 
 socket.on("disconnect", () => {
   socketState.connected = false;
   socketState.id = "";
-  console.log("❌ Сокет отключен");
+  console.log("❌ Socket disconnected");
 });

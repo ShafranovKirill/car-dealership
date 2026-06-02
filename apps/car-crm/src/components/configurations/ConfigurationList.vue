@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ConfigurationResponse } from '@car/types';
+import { useI18n } from 'vue-i18n';
 import { ImageHelper } from '@/utils/image.utils';
 import { PHOTO_KEYS } from '@car/common';
+  const { t } = useI18n();
 
 function getFirstPhoto(photos: Record<string, any> | null | undefined, key: string): string | null {
   if (!photos) return null;
@@ -24,7 +26,7 @@ const emits = defineEmits<{
 }>();
 
 function confirmDelete(configId: string) {
-  if (confirm('Вы уверены, что хотите удалить эту комплектацию?')) {
+  if (confirm(t('configuration.confirmDelete'))) {
     emits('delete', configId);
   }
 }
@@ -33,19 +35,19 @@ function confirmDelete(configId: string) {
 <template>
   <div class="space-y-3">
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-800">Комплектации</h3>
+      <h3 class="text-lg font-semibold text-gray-800">{{ t('configuration.titleList') }}</h3>
       <button
         @click="$emit('add')"
         :disabled="loading"
         class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-400"
       >
-        + Добавить комплектацию
+        {{ '+ ' + t('configuration.add') }}
       </button>
     </div>
 
-    <div v-if="loading" class="text-center py-4 text-gray-500">Загрузка...</div>
+    <div v-if="loading" class="text-center py-4 text-gray-500">{{ t('common.loading') }}</div>
     <div v-else-if="!configurations.length" class="text-center py-6 text-gray-500">
-      Комплектаций нет. Нажмите "Добавить комплектацию" чтобы создать первую.
+      {{ t('configuration.emptyMessage') }}
     </div>
 
     <div v-else class="space-y-2">
@@ -63,7 +65,7 @@ function confirmDelete(configId: string) {
               class="h-full w-full object-cover"
             />
             <div v-else class="flex h-full items-center justify-center text-xs text-gray-400">
-              Нет фото
+              {{ t('configuration.noPhoto') }}
             </div>
           </div>
 
@@ -80,14 +82,14 @@ function confirmDelete(configId: string) {
                   :disabled="loading"
                   class="rounded-md bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-200 disabled:bg-gray-100 disabled:text-gray-400"
                 >
-                  Редактировать
+                  {{ t('common.edit') }}
                 </button>
                 <button
                   @click="confirmDelete(config.id)"
                   :disabled="loading"
                   class="rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 disabled:bg-gray-100 disabled:text-gray-400"
                 >
-                  Удалить
+                  {{ t('common.delete') }}
                 </button>
               </div>
             </div>
