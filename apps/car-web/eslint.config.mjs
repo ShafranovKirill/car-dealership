@@ -1,33 +1,65 @@
-import pluginVue from 'eslint-plugin-vue'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import eslintConfigPrettier from 'eslint-config-prettier'
-import tseslint from 'typescript-eslint'
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import pluginVue from "eslint-plugin-vue";
+import vueParser from "vue-eslint-parser";
+import skipFormatting from "eslint-config-prettier";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-export default defineConfigWithVueTs(
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default tseslint.config(
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    ignores: ["dist/**", "node_modules/**", "public/**", "temp/**", "**/*.config.js"],
   },
 
-  {
-    ignores: ['dist/**', 'node_modules/**', '.vite/**'],
-  },
-
-  ...pluginVue.configs['flat/essential'],
-
-  vueTsConfigs.recommended,
+  eslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  ...pluginVue.configs["flat/recommended"],
 
   {
-    files: ['**/*.{vue,ts,mts,tsx}'],
+    files: ["**/*.vue", "**/*.ts", "**/*.tsx"],
     languageOptions: {
+      parser: vueParser,
       parserOptions: {
         parser: tseslint.parser,
-        project: ['./tsconfig.app.json', './tsconfig.node.json'],
-        tsconfigRootDir: import.meta.dirname,
-        extraFileExtensions: ['.vue'],
+        project: "./tsconfig.app.json",
+        tsconfigRootDir: __dirname,
+        extraFileExtensions: [".vue"],
       },
+    },
+    rules: {
+      "vue/multi-word-component-names": "warn",
+      "vue/attribute-hyphenation": ["error", "always"],
+      "vue/html-self-closing": "off",
+      "vue/max-attributes-per-line": [
+        "error",
+        {
+          singleline: 3,
+          multiline: 1,
+        },
+      ],
+
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+
+      "@typescript-eslint/no-floating-promises": [
+        "error",
+        {
+          ignoreIIFE: true,
+          allowForKnownSafePromises: true,
+        },
+      ],
+
+      "no-console": process.env.NODE_ENV === "production" ? "error" : "warn",
+      "no-debugger": process.env.NODE_ENV === "production" ? "error" : "warn",
     },
   },
 
-  eslintConfigPrettier,
-)
+  {
+    files: ["vite.config.ts", "vitest.config.ts"],
+    ...tseslint.configs.disableTypeChecked,
+  },
+  skipFormatting,
+);

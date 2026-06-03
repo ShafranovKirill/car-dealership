@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
     envDir: rootDir,
     envPrefix: ["VITE_", "DB_", "STORAGE_"],
     server: {
-      port: Number(loadedEnv.VITE_PORT_CRM) || 5173,
+      port: Number(loadedEnv.VITE_PORT_CRM) || 4200,
     },
     plugins: [
       vue(),

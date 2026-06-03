@@ -1,4 +1,4 @@
-import { PhotoKey } from "@common/photo-keys.js";
+import type { PhotoKey } from "@car/common";
 
 export interface ConfigurationResponse {
   id: string;

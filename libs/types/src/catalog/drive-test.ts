@@ -1,4 +1,4 @@
-import { DriveTestStatus } from "@prisma-generated/prisma/client.js";
+import type { DriveTestStatus } from "@prisma/client";
 
 export interface DriveTestResponse {
   id: string;

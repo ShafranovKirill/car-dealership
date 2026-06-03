@@ -1,5 +1,5 @@
-import { PhotoKey } from "@common/photo-keys.js";
-import { BodyType, CarClass, DriveType, EngineType, TransmissionType } from "@prisma-generated/prisma/client.js";
+import type { PhotoKey } from "@car/common";
+import type { BodyType, CarClass, DriveType, EngineType, TransmissionType } from "@prisma/client";
 
 export interface CarModelResponse {
   id: string;
