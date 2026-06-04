@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import TestDriveModal from '@/components/test-drive/TestDriveModal.vue'
+import AutoLoanModal from '@/components/auto-loan/AutoLoanModal.vue'
 
 const navLinks = [
   { name: 'Каталог', to: '/catalog' },
@@ -9,6 +11,8 @@ const navLinks = [
 ]
 
 const isScrolled = ref(false)
+const isTestDriveOpen = ref(false)
+const isAutoLoanOpen = ref(false)
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
@@ -21,6 +25,14 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
+
+const openTestDrive = () => {
+  isTestDriveOpen.value = true
+}
+
+const openAutoLoan = () => {
+  isAutoLoanOpen.value = true
+}
 </script>
 
 <template>
@@ -63,6 +75,16 @@ onUnmounted(() => {
         </a>
 
         <button
+          @click="openAutoLoan"
+          type="button"
+          class="hidden sm:flex relative items-center justify-center px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl shadow-md shadow-blue-500/20 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 overflow-hidden group"
+        >
+          <span class="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1s_ease-in-out]" />
+          <span class="relative">💳 Кредит</span>
+        </button>
+
+        <button
+          @click="openTestDrive"
           type="button"
           class="relative inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl shadow-md shadow-blue-500/20 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 overflow-hidden group"
         >
@@ -74,6 +96,8 @@ onUnmounted(() => {
   </header>
   
   <BranchSelectionModal />
+  <AutoLoanModal v-model:show="isAutoLoanOpen" />
+  <TestDriveModal v-model:show="isTestDriveOpen" />
   
   <div class="h-16"></div>
 </template>
