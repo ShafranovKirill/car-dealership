@@ -25,7 +25,6 @@ export class CreateCarModelRequestDto implements CreateCarModelRequest {
 
   @ApiProperty({ example: 'G30 LCI' })
   @IsString()
-  @IsNotEmpty()
   generation!: string;
 
   @ApiProperty({ example: 2020 })

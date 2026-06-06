@@ -68,6 +68,15 @@ async function saveModel(dto: Partial<CreateCarModelRequest>) {
   }
 }
 
+async function deleteModel(model: CarModelResponse) {
+  if (!confirm(t('models.deleteConfiguration'))) return;
+  try {
+    await store.remove(model.id);
+  } catch (error) {
+    console.error('Failed to delete model:', error);
+  }
+}
+
 async function uploadPhoto(payload: { modelId: string; file: File }) {
   await store.uploadPhoto(payload.modelId, payload.file, socket.id || '');
 }
@@ -130,6 +139,7 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
           @edit="openEditModal"
           @upload-photo="uploadPhoto"
           @delete-photo="deletePhoto"
+          @delete="deleteModel"
         />
       </div>
     </div>

@@ -58,7 +58,7 @@ function formatPrice(value: number) {
 </script>
 
 <template>
-  <section class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+  <section class="min-h-screen  py-8 px-4 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-8">
         <div>
@@ -94,12 +94,12 @@ function formatPrice(value: number) {
             class="group overflow-hidden rounded-4xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
             <button @click="openModel(model.id)" class="flex h-full flex-col text-left">
-              <div class="relative h-72 sm:h-80 overflow-hidden bg-slate-100">
+              <div class="relative w-full overflow-hidden bg-slate-100">
                 <img
                   v-if="getImageUrl(model)"
                   :src="getImageUrl(model)"
                   alt="Фото модели"
-                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  class="w-full h-auto object-contain transition duration-500 group-hover:scale-105"
                 />
                 <div v-else class="flex h-full items-center justify-center text-slate-400">
                   Нет фото

@@ -16,6 +16,7 @@ const emits = defineEmits<{
   (e: 'edit', model: CarModelResponse): void;
   (e: 'upload-photo', payload: { modelId: string; file: File }): void;
   (e: 'delete-photo', payload: { model: CarModelResponse; index: number }): void;
+  (e: 'delete', model: CarModelResponse): void;
 }>();
 
 const expanded = ref(false);
@@ -172,6 +173,10 @@ function removePhoto(index: number) {
   emits('delete-photo', { model: props.model, index });
 }
 
+function triggerDeleteModel() {
+  emits('delete', props.model);
+}
+
 function getPhotoArray(photos: Record<string, any> | null | undefined, key: string): string[] {
   if (!photos) return [];
   const value = photos[key];
@@ -200,6 +205,9 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
         <button @click="$emit('edit', model)" class="px-3 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
           {{ t('common.edit') }}
         </button>
+        <button @click="triggerDeleteModel" class="px-3 py-1.5 text-xs sm:text-sm bg-red-600 text-white rounded hover:bg-red-700 whitespace-nowrap">
+          {{ t('common.delete') }}
+        </button>
       </div>
     </div>
 
@@ -207,11 +215,13 @@ function getPhotoArray(photos: Record<string, any> | null | undefined, key: stri
       <div v-if="expanded" class="mt-4 border-t border-gray-200 pt-4 text-sm sm:text-sm text-gray-600">
         <div class="space-y-4">
           <div class="mt-2">
-            <PhotoSlider
-              :photos="photoKeys"
-              @delete="removePhoto"
-              @upload="(file: any) => $emit('upload-photo', { modelId: model.id, file })"
-            />
+            <div class="-mx-3 sm:-mx-4">
+              <PhotoSlider
+                :photos="photoKeys"
+                @delete="removePhoto"
+                @upload="(file: any) => $emit('upload-photo', { modelId: model.id, file })"
+              />
+            </div>
           </div>
 
           <div>

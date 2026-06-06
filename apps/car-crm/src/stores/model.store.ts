@@ -44,7 +44,10 @@ export const useModelStore = defineStore("model", {
         headers: { "Content-Type": "multipart/form-data" },
         params: { socketId },
       });
-      await this.fetchAll();
+      // Do not immediately reload all models here to avoid closing
+      // any open edit modal unexpectedly. The server will emit a
+      // SocketEvent.PHOTO_EDIT_RESULT when processing completes,
+      // and the socket listener handles reloading.
     },
 
     async deletePhoto(modelId: string, fileKey: string) {
