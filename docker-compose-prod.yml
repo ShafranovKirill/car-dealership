@@ -1,0 +1,130 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --certificatesResolvers.le.acme.tlsChallenge=true
+      - --certificatesResolvers.le.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesResolvers.le.acme.storage=/letsencrypt/acme.json
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY}
+    volumes:
+      - minio_data_prod:/data
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0
+    depends_on:
+      - redis
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  car-api:
+    # Build from local source; ensure a Dockerfile exists in apps/car-api
+    build:
+      context: ./apps/car-api
+      target: production
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}?schema=public"
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      PORT: ${PORT}
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.car-api.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.car-api.entrypoints=websecure"
+      - "traefik.http.routers.car-api.tls.certresolver=le"
+      - "traefik.http.services.car-api.loadbalancer.server.port=${PORT}"
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  car-web:
+    # Build production static and serve with a simple nginx (requires Dockerfile in apps/car-web)
+    build:
+      context: ./apps/car-web
+      target: production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.car-web.rule=Host(`web.${DOMAIN}`)"
+      - "traefik.http.routers.car-web.entrypoints=websecure"
+      - "traefik.http.routers.car-web.tls.certresolver=le"
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+  car-crm:
+    build:
+      context: ./apps/car-crm
+      target: production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.car-crm.rule=Host(`crm.${DOMAIN}`)"
+      - "traefik.http.routers.car-crm.entrypoints=websecure"
+      - "traefik.http.routers.car-crm.tls.certresolver=le"
+    networks:
+      - car-network-prod
+    restart: unless-stopped
+
+networks:
+  car-network-prod:
+    driver: bridge
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  minio_data_prod:
+  letsencrypt:

@@ -2,7 +2,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@car/types": ["libs/types"]
+      "@car/types": ["libs/types"],
+      "@car/common": ["libs/common"],
+      "@prisma-generated/*": ["apps/car-api/generated/*"]
     }
   }
 }

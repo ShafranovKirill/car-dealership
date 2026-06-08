@@ -5,7 +5,7 @@ export interface RefreshStaffTokenPayload {
   exp?: number;
 }
 
-export interface AccessStaffTokenPayload extends RefreshStaffTokenPayload {}
+export type AccessStaffTokenPayload = RefreshStaffTokenPayload;
 
 export interface CreateStaffRequest {
   branchIds: string[];

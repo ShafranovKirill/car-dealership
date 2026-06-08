@@ -6,127 +6,74 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 model Brand {
   id        String     @id @default(uuid())
-  name      String     @unique // Название марки (например, BMW, Audi)
-  logo      String     // Ссылка на фото/логотип марки
-  
+  name      String     @unique
+  images    Json?
   carModels CarModel[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("brands")
 }
 
 model CarModel {
-  id             String           @id @default(uuid())
-  modelName      String           // Модель (например, X5)
-  generation     String           // Поколение (например, G05)
-  yearFrom       Int              // Год начала производства поколения
-  yearTo         Int?             // Год окончания (null, если выпускается сейчас)
-  bodyType       BodyType
-  carClass       CarClass
-  images         Json             
-  
-  transmission   TransmissionType 
-  drive          DriveType        
+  id         String    @id @default(uuid()) // ID модели (UUID)
+  name       String // Название модели (например, "Camry")
+  generation String? // Поколение (например, "XV70")
+  yearFrom   Int?      @map("year_from") // Год начала производства
+  yearTo     Int?      @map("year_to") // Год окончания производства (null, если еще выпускается)
+  bodyType   BodyType? @map("body_type") // Тип кузова (седан, хэтчбек и т.д.)
+  carClass   CarClass? @map("car_class") // Класс автомобиля (A, B, C, D, E и т.д.)
+  images     Json? // Ссылки на картинки (в формате JSON)
 
-  brandId        String
-  brand          Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  minPrice Int? @map("min_price") // Минимальная цена автомобиля
 
-  engineId       String
-  engine         Engine           @relation(fields: [engineId], references: [id], onDelete: Restrict)
-  
-  dimensions     Dimensions?      
-  configurations Configuration[]  
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  brandId String @map("brand_id") // ID бренда (внешний ключ)
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade) // Связь с моделью бренда
 
-  @@map("car_models")
-}
+  length    Int // Длина (в мм)
+  width     Int // Ширина (в мм)
+  height    Int // Высота (в мм)
+  wheelbase Int // Колесная база (в мм)
+  clearance Int // Дорожный просвет / клиренс (в мм)
 
-model Dimensions {
-  id             String   @id @default(uuid())
-  length         Int      // Длина в мм
-  width          Int      // Ширина в мм
-  height         Int      // Высота в мм
-  wheelbase      Int      // Колесная база в мм
-  clearance      Int      // Клиренс (дорожный просвет) в мм
-  trunkVolume    Int      // Объем багажника в литрах (минимальный)
-  trunkMaxVolume Int?     // Объем багажника при сложенных сиденьях (опционально)
+  trunkVolume    Int  @map("trunk_volume") // Объем багажника (в литрах)
+  trunkMaxVolume Int? @map("trunk_max_volume") // Максимальный объем багажника (при сложенных сиденьях)
 
-  carModelId     String   @unique
-  carModel       CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade)
+  engineType     EngineType       @map("engine_type") // Тип двигателя (бензин, дизель, гибрид, электро)
+  engineVolume   Float            @map("engine_volume") // Объем двигателя (в литрах, например: 2.0)
+  enginePower    Int              @map("engine_power") // Мощность двигателя (в л.с.)
+  engineTorque   Int              @map("engine_torque") // Крутящий момент (в Нм)
+  cylindersCount Int?             @map("cylinders_count") // Количество цилиндров (null для электромобилей)
+  transmission   TransmissionType // Тип коробки передач (автомат, механика, робот)
+  driveType      DriveType        @map("drive_type") // Тип привода (передний, задний, полный)
 
-  @@map("dimensions")
-}
+  configurations Configuration[] // Комплектация автомобиля
 
-model Engine {
-  id             String          @id @default(uuid())
-  name           String          // Код/название двигателя (например, EA888, B58)
-  type           EngineType      // Тип топлива / питания
-  volume         Float           // Объем в литрах (например, 2.0). Для электро можно ставить 0
-  power          Int             // Мощность в л.с.
-  torque         Int             // Крутящий момент в Нм
-  cylinderCount  Int?            // Количество цилиндров (опционально для электро)
+  createdAt  DateTime    @default(now()) @map("created_at") // Дата добавления записи в базу
+  updatedAt  DateTime    @updatedAt @map("updated_at") // Дата последнего обновления записи
+  driveTests DriveTest[]
 
-  carModels      CarModel[]      // Теперь один двигатель может стоять на разных моделях машин
-
-  @@map("engines")
+  @@map("car_models") // Имя таблицы в БД
 }
 
 model Configuration {
-  id             String           @id @default(uuid())
-  name           String           // Название комплектации (например, "Comfort", "M Sport")
-  price          Int              // Цена в копейках или целых единицах валюты
+  id          String @id @default(uuid())
+  name        String
+  price       Int
+  description String
+  images      Json?
 
-  carModelId     String
-  carModel       CarModel         @relation(fields: [carModelId], references: [id], onDelete: Cascade)
-  
-  customFeatures ConfigurationCustomFeature[]
+  carModelId String   @unique @map("car_model_id")
+  carModel   CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade)
 
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("configurations")
-}
-
-model FeatureCategory {
-  id        String   @id @default(uuid())
-  name      String   @unique // Название категории
-  order     Int      @default(0) 
-
-  featureKeys CustomFeatureKey[]
-
-  @@map("feature_categories")
-}
-
-model CustomFeatureKey {
-  id                String   @id @default(uuid())
-  name              String   @unique // Название характеристики (например, "Климат-контроль")
-  
-  categoryId        String
-  category          FeatureCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
-  configurations    ConfigurationCustomFeature[]
-
-  @@map("custom_feature_keys")
-}
-
-model ConfigurationCustomFeature {
-  id              String           @id @default(uuid())
-  
-  configurationId String
-  configuration   Configuration    @relation(fields: [configurationId], references: [id], onDelete: Cascade)
-
-  featureKeyId    String
-  featureKey      CustomFeatureKey @relation(fields: [featureKeyId], references: [id], onDelete: Cascade)
-
-  value           String          
-
-  @@unique([configurationId, featureKeyId]) 
-  @@map("configuration_custom_features")
 }
 
 model Staff {
@@ -157,44 +104,66 @@ model MediaFile {
   @@map("media_files")
 }
 
+model DriveTest {
+  id          String          @id @default(uuid())
+  clientPhone String          @map("client_phone")
+  status      DriveTestStatus @default(NEW)
+
+  carModelId String   @map("car_model_id")
+  carModel   CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime? @map("scheduled_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("drive_tests")
+}
+
 enum BodyType {
-  SEDAN       // Седан
-  HATCHBACK   // Хэтчбек
-  SUV         // Внедорожник / Кроссовер
-  WAGON       // Универсал
-  COUPE       // Купе
-  MINIVAN     // Минивэн
-  PICKUP      // Пикап
+  SEDAN
+  HATCHBACK
+  SUV
+  WAGON
+  COUPE
+  MINIVAN
+  PICKUP
 }
 
 enum CarClass {
-  A // Особо малый (Smart Fortwo)
-  B // Малый (VW Polo, Kia Rio)
-  C // Малый средний (Toyota Corolla, VW Golf)
-  D // Средний (BMW 3, Passat)
-  E // Бизнес-класс (Audi A6, Mercedes E-class)
-  F // Представительский (BMW 7, Maybach)
-  J // Внедорожники и кроссоверы
-  M // Минивэны
-  S // Спортивные купе / суперкары
+  A
+  B
+  C
+  D
+  E
+  F
+  J
+  M
+  S
 }
 
 enum EngineType {
-  BENZIN    // Бензиновый
-  DIESEL    // Дизельный
-  HYBRID    // Гибрид
-  ELECTRIC  // Электромотор
+  BENZIN
+  DIESEL
+  HYBRID
+  ELECTRIC
 }
 
 enum TransmissionType {
-  MANUAL       // Механическая (МКПП)
-  AUTOMATIC    // Автоматическая (АКПП)
-  ROBOT        // Роботизированная (РКПП)
-  VARIATOR     // Вариатор (CVT)
+  MANUAL
+  AUTOMATIC
+  ROBOT
+  VARIATOR
 }
 
 enum DriveType {
-  FWD // Передний привод
-  RWD // Задний привод
-  AWD // Полный привод
+  FWD
+  RWD
+  AWD
+}
+
+enum DriveTestStatus {
+  NEW
+  CONFIRMED
+  CANCELED
 }

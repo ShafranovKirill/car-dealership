@@ -12,7 +12,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@prisma-generated/*": ["../../apps/car-api/generated/*"]
+      "@prisma/client": ["../../apps/car-api/generated/prisma/client.ts"],
+      "@prisma-generated/*": ["../../apps/car-api/generated/*"],
+      "@car/common": ["../common/src/index.ts"],    
     }
   },
   "include": ["src/**/*"],
