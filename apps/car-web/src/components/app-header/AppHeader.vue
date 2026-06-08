@@ -3,12 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import TestDriveModal from '@/components/test-drive/TestDriveModal.vue'
 import AutoLoanModal from '@/components/auto-loan/AutoLoanModal.vue'
 
-const navLinks = [
-  { name: 'Каталог', to: '/catalog' },
-  { name: 'Тест-драйв', to: '/test-drive' },
-  { name: 'Сервис', to: '/service' },
-  { name: 'Контакты', to: '/contacts' },
-]
+
 
 const isScrolled = ref(false)
 const isTestDriveOpen = ref(false)
@@ -54,20 +49,10 @@ const openAutoLoan = () => {
           to="/" 
           class="text-lg font-black tracking-wider uppercase bg-linear-to-r from-slate-900 via-blue-600 to-slate-900 dark:from-white dark:via-blue-400 dark:to-white bg-size-[200%_auto] bg-clip-text text-transparent animate-gradient-flow"
         >
-          Car<span class="text-blue-500">.</span>Dealer
+          САЛОН<span class="text-blue-500">.</span>ВОЗРОЖДЕНИЕ
         </router-link>
       </div>
 
-      <nav class="hidden md:flex items-center gap-6">
-        <router-link 
-          v-for="link in navLinks" 
-          :key="link.to"
-          :to="link.to" 
-          class="relative py-2 text-sm font-medium text-slate-600 dark:text-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-blue-600 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-105"
-        >
-          {{ link.name }}
-        </router-link>
-      </nav>
 
       <div class="flex items-center gap-4">
         <a href="tel:+78005553535" class="hidden lg:block text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 transition">
