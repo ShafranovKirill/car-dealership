@@ -6,8 +6,13 @@ services:
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      # Точки входа для HTTP и HTTPS
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
+      # Настройка автоматического редиректа с HTTP на HTTPS
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      # Конфигурация Let's Encrypt для SSL
       - --certificatesResolvers.le.acme.tlsChallenge=true
       - --certificatesResolvers.le.acme.email=${LETSENCRYPT_EMAIL}
       - --certificatesResolvers.le.acme.storage=/letsencrypt/acme.json
@@ -65,7 +70,6 @@ services:
     restart: unless-stopped
 
   car-api:
-    # Build from local source; ensure a Dockerfile exists in apps/car-api
     build:
       context: ./apps/car-api
       target: production
@@ -84,7 +88,8 @@ services:
       - minio
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.car-api.rule=Host(`api.${DOMAIN}`)"
+      # Роутинг на ваш API домен
+      - "traefik.http.routers.car-api.rule=Host(`car-dealer-api.shafranov.site`)"
       - "traefik.http.routers.car-api.entrypoints=websecure"
       - "traefik.http.routers.car-api.tls.certresolver=le"
       - "traefik.http.services.car-api.loadbalancer.server.port=${PORT}"
@@ -93,13 +98,13 @@ services:
     restart: unless-stopped
 
   car-web:
-    # Build production static and serve with a simple nginx (requires Dockerfile in apps/car-web)
     build:
       context: ./apps/car-web
       target: production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.car-web.rule=Host(`web.${DOMAIN}`)"
+      # Роутинг на ваш основной домен фронтенда
+      - "traefik.http.routers.car-web.rule=Host(`car-dealer.shafranov.site`)"
       - "traefik.http.routers.car-web.entrypoints=websecure"
       - "traefik.http.routers.car-web.tls.certresolver=le"
     networks:
@@ -112,7 +117,8 @@ services:
       target: production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.car-crm.rule=Host(`crm.${DOMAIN}`)"
+      # Роутинг на ваш домен CRM панели
+      - "traefik.http.routers.car-crm.rule=Host(`car-dealer-crm.shafranov.site`)"
       - "traefik.http.routers.car-crm.entrypoints=websecure"
       - "traefik.http.routers.car-crm.tls.certresolver=le"
     networks:
