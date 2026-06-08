@@ -1,0 +1,21 @@
+<script setup lang="ts">
+
+const isMenuOpen = defineModel('isMenuOpen', { type: Boolean })
+</script>
+<template>
+  <header
+    class="fixed top-0 left-0 z-50 w-full border-b border-(--p-content-border-color) bg-(--p-content-background)"
+  >
+    <div class="mx-auto gap-5 flex h-16 items-center justify-between px-4 lg:px-8">
+      <div class="flex gap-5">
+        <Button icon="pi pi-bars" @click="isMenuOpen = !isMenuOpen" class="rounded-xl!" />
+
+      </div>
+
+      <div class="hidden lg:block">
+        <CartButton />
+      </div>
+    </div>
+  </header>
+  <BranchSelectionModal />
+</template>

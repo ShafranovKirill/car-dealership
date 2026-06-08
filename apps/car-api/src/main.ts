@@ -19,6 +19,17 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
+  app.enableCors({
+    origin: [
+      `http://localhost:${process.env.VITE_PORT_CRM || 4200}`,
+      `http://localhost:${process.env.VITE_PORT_WEB || 4300}`,
+    ],
+
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -38,29 +49,11 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description:
-          'Client JWT token (from /client/login or /client/register)',
-        in: 'header',
-      },
-      'client-auth',
-    )
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
         description: 'Staff JWT token (from /staff/login)',
         in: 'header',
       },
       'staff-auth',
     )
-    .addCookieAuth('client_refresh_token', {
-      type: 'apiKey',
-      in: 'cookie',
-      name: 'client_refresh_token',
-      description: 'Refresh token for Clients',
-    })
     .addCookieAuth('staff_refresh_token', {
       type: 'apiKey',
       in: 'cookie',

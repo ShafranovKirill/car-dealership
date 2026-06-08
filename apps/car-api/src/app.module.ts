@@ -10,6 +10,10 @@ import { PrismaService } from './prisma/prisma.service.js';
 import { SessionMiddleware } from './shared/middleware/session.middleware.js';
 import { RedisModule } from './redis/redis.module.js';
 import { BullModule } from '@nestjs/bullmq';
+import { ConfigurationModule } from './catalog/configuration/configuration.module.js';
+import { BrandModule } from './catalog/brand/brand.module.js';
+import { ModelModule } from './catalog/model/model.module.js';
+import { TestingModule } from './testing/testing.module.js';
 
 @Module({
   imports: [
@@ -18,6 +22,10 @@ import { BullModule } from '@nestjs/bullmq';
     EventEmitterModule.forRoot(),
     IdentityModule,
     RedisModule,
+    ConfigurationModule,
+    BrandModule,
+    ModelModule,
+    TestingModule,
     ClsModule.forRoot({
       global: true,
       middleware: { mount: true },

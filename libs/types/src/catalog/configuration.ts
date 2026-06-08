@@ -1,0 +1,23 @@
+import type { PhotoKey } from "@car/common";
+
+export interface ConfigurationResponse {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  carModelId: string;
+  images: Record<PhotoKey, string> | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface CreateConfigurationRequest {
+  name: string;
+  price: number;
+  description: string;
+  carModelId: string;
+}
+
+export type UpdateConfigurationRequest = Partial<Omit<CreateConfigurationRequest, "carModelId">> & {
+  configurationId: string;
+};

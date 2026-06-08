@@ -9,7 +9,7 @@ import { FileUploadFailedException } from '../../shared/exceptions/domain_except
 import { UploadFile } from '../interface/upload-file.interface.js';
 import { PhotoProfile } from '../photo-configs/profiles.js';
 import { PhotoKey } from '@car/common';
-import { DelivestEvent } from '../../shared/events/types.js';
+import { ProjectEvent } from '../../shared/events/types.js';
 
 @Injectable()
 export class PhotoEditorService {
@@ -26,8 +26,8 @@ export class PhotoEditorService {
     file: UploadFile,
     configs: { profile: PhotoProfile; key: PhotoKey }[],
     socketId: string,
-    eventType: DelivestEvent,
-    failEventType: DelivestEvent,
+    eventType: ProjectEvent,
+    failEventType: ProjectEvent,
   ): Promise<void> {
     try {
       const savedFile = await this.mediaService.uploadFile(file, targetId);
