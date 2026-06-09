@@ -20,14 +20,19 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
-    origin: [
-      `http://localhost:${process.env.VITE_PORT_CRM || 4200}`,
-      `http://localhost:${process.env.VITE_PORT_WEB || 4300}`,
-    ],
-
+    origin: isProduction
+      ? [
+          'https://car-dealer.shafranov.site',
+          'https://car-dealer-crm.shafranov.site',
+        ]
+      : [
+          `http://localhost:${process.env.VITE_PORT_CRM || 4200}`,
+          `http://localhost:${process.env.VITE_PORT_WEB || 4300}`,
+          'http://localhost:8080',
+          'http://localhost:8081',
+        ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    credentials: true, // Нужно, если передаешь куки или сессии/Auth-заголовки
   });
 
   app.useGlobalPipes(
