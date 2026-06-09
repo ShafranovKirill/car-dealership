@@ -3,33 +3,33 @@ FROM node:22-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-# Устанавливаем ровно ту версию pnpm, которая стоит у тебя локально на Fedora
 RUN npm install -g pnpm@10.27.0
-
-# Выделяем память под сборку
 ENV NODE_OPTIONS="--max-old-space-size=3072"
-
 WORKDIR /app
 
-# Копируем исходный код
 COPY . .
 
-# Шаг 1: Установка зависимостей. v10 сама автоматически применит onlyBuiltDependencies из package.json!
-# Шаг 1: Ставим зависимости и принудительно мигрируем локфайл под pnpm v10
+# Шаг 1: Ставим зависимости
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm install --force --child-concurrency 1 --aggregate-output
     
-    # Шаг 2: Генерируем типы Prisma с фейковой строкой подключения для прохождения валидации
+# Шаг 2: Генерируем Prisma глобально в корень (или во все пакеты сразу)
+# Флаг --recursive заставит prisma сгенерировать типы везде, где она импортируется
 RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy pnpm --filter car-api prisma:generate
 
-# Шаг 3: Синхронизируем сгенерированный клиент Prisma по всему воркспейсу, чтобы vue-tsc на фронтенде видел енамы
-RUN find node_modules -type d -name ".prisma" -exec cp -R apps/car-api/node_modules/.prisma/client {}/ \; 2>/dev/null || true
+# ИСПРАВЛЕНИЕ ХАКА: Чтобы типы гарантированно были доступны в libs/types, 
+# выполним генерацию прямо из корня (если в schema.prisma не изменен output)
+# Либо, если это не помогло, явно генерируем клиент прямо в корневой node_modules:
+RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --schema=apps/car-api/prisma/schema.prisma
 
-# Шаг 4: Собираем локальные библиотеки воркспейса
+# УДАЛЕНО: Шаг 3 (с find и cp) больше не нужен, так как npx prisma generate из корня 
+# положит типы в глобальный node_modules, откуда их увидят и libs/types, и apps/car-crm.
+
+# Шаг 3: Собираем локальные библиотеки воркспейса
 RUN pnpm --filter @car/types build && pnpm --filter @car/common build
 
-# Шаг 5: Запускаем финальную сборку всех приложений
+# Шаг 4: Запускаем финальную сборку всех приложений
 RUN pnpm run build
 
 # --- Стейдж 2: Финальный образ для car-api ---

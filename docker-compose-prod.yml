@@ -1,19 +1,6 @@
-services:
-  traefik:
-    image: traefik:v2.10
-    command:
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --entryPoints.web.address=:80
-    ports:
-      # Пробрасываем порты на 8080 под твой внешний Nginx
-      - "8080:80"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - car-network-prod
-    restart: unless-stopped
+version: "3.8"
 
+services:
   postgres:
     container_name: car-postgres
     image: postgres:16-alpine
@@ -68,7 +55,7 @@ services:
       target: production-api
     environment:
       NODE_ENV: ${NODE_ENV}
-      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}?schema=public"
+      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?schema=public"
       REDIS_HOST: redis
       REDIS_PORT: ${REDIS_PORT}
       STORAGE_ENDPOINT: ${STORAGE_ENDPOINT}
@@ -79,11 +66,8 @@ services:
       - postgres
       - redis
       - minio
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.car-api.rule=Host(`car-dealer-api.shafranov.site`)"
-      - "traefik.http.routers.car-api.entrypoints=web"
-      - "traefik.http.services.car-api.loadbalancer.server.port=3000"
+    ports:
+      - "${PORT:-3000}:3000"
     networks:
       - car-network-prod
     restart: unless-stopped
@@ -93,11 +77,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production-web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.car-web.rule=Host(`car-dealer.shafranov.site`)"
-      - "traefik.http.routers.car-web.entrypoints=web"
-      - "traefik.http.services.car-web.loadbalancer.server.port=80"
+    ports:
+      - "8080:80"
     networks:
       - car-network-prod
     restart: unless-stopped
@@ -107,11 +88,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production-crm
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.car-crm.rule=Host(`car-dealer-crm.shafranov.site`)"
-      - "traefik.http.routers.car-crm.entrypoints=web"
-      - "traefik.http.services.car-crm.loadbalancer.server.port=80"
+    ports:
+      - "8081:80"
     networks:
       - car-network-prod
     restart: unless-stopped
