@@ -1,0 +1,63 @@
+# Перенаправление всего HTTP (порт 80) на HTTPS
+server {
+    listen 80;
+    server_name car-dealer.shafranov.site car-dealer-api.shafranov.site car-dealer-crm.shafranov.site;
+    return 301 https://$host$request_uri;
+}
+
+# 1. Клиентское приложение - Фронтенд (car-web)
+server {
+    listen 443 ssl;
+    server_name car-dealer.shafranov.site;
+
+    ssl_certificate /etc/letsencrypt/live/car-dealer.shafranov.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/car-dealer.shafranov.site/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# 2. Бэкенд + WebSockets (car-api)
+# 2. Бэкенд + WebSockets (car-api)
+server {
+    listen 443 ssl;
+    server_name car-dealer-api.shafranov.site;
+
+    ssl_certificate /etc/letsencrypt/live/car-dealer.shafranov.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/car-dealer.shafranov.site/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# 3. CRM-панель (car-crm)
+server {
+    listen 443 ssl;
+    server_name car-dealer-crm.shafranov.site;
+
+    ssl_certificate /etc/letsencrypt/live/car-dealer.shafranov.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/car-dealer.shafranov.site/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
