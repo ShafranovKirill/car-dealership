@@ -1,11 +1,16 @@
 import { type PhotoKey } from "@car/common";
 
 export const ImageHelper = {
-  endpoint: import.meta.env.STORAGE_ENDPOINT_PUBLIC,
-  bucket: import.meta.env.STORAGE_BUCKET_NAME,
+  endpoint: import.meta.env.VITE_STORAGE_ENDPOINT_PUBLIC,
+  bucket: import.meta.env.VITE_STORAGE_BUCKET_NAME,
 
   generatePublicUrl(fileKey: string | null | undefined): string | null {
     if (!fileKey || !this.endpoint || !this.bucket) {
+      console.warn("ImageHelper: Missing config or fileKey", {
+        endpoint: this.endpoint,
+        bucket: this.bucket,
+        fileKey,
+      });
       return null;
     }
     const base = this.endpoint.replace(/\/$/, "");

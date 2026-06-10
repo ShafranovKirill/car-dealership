@@ -1,7 +1,7 @@
 # Перенаправление всего HTTP (порт 80) на HTTPS
 server {
     listen 80;
-    server_name car-dealer.shafranov.site car-dealer-api.shafranov.site car-dealer-crm.shafranov.site;
+    server_name car-dealer.shafranov.site car-dealer-api.shafranov.site car-dealer-crm.shafranov.site storage.shafranov.site;
     return 301 https://$host$request_uri;
 }
 
@@ -59,5 +59,24 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name storage.shafranov.site;
+
+    ssl_certificate /etc/letsencrypt/live/car-dealer.shafranov.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/car-dealer.shafranov.site/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+        
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        client_max_body_size 50M;
     }
 }

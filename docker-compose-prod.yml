@@ -25,6 +25,9 @@ services:
       - minio_data_prod:/data
     networks:
       - car-network-prod
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     restart: unless-stopped
 
   redis:
