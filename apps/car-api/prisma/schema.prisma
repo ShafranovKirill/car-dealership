@@ -67,7 +67,7 @@ model Configuration {
   description String
   images      Json?
 
-  carModelId String   @unique @map("car_model_id")
+  carModelId String   @map("car_model_id")
   carModel   CarModel @relation(fields: [carModelId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")

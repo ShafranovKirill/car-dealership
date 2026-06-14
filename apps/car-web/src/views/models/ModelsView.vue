@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useModelStore } from '@/stores/model.store'
 import type { CarModelResponse } from '@car/types'
 import { PHOTO_KEYS } from '@car/common'
 import { ImageHelper } from '@/utils/image.utils'
+import { fetchBrands } from '@/services/brand.service'
+import type { BrandResponse } from '@car/types'
 
 const router = useRouter()
 const store = useModelStore()
@@ -12,6 +14,10 @@ const page = ref(1)
 const perPage = 8
 const error = ref('')
 const noMore = ref(false)
+const brands = ref<BrandResponse[]>([])
+const selectedBrand = ref<string | null>(null)
+const sortBy = ref<'price' | 'year' | 'name'>('price')
+const sortDir = ref<'asc' | 'desc'>('asc')
 
 async function loadModels() {
   store.isLoading = true
@@ -47,6 +53,31 @@ watch(page, async () => {
 })
 
 onMounted(loadModels)
+
+// load brands once
+onMounted(async () => {
+  try {
+    brands.value = await fetchBrands()
+  } catch (e) {
+    // ignore
+  }
+})
+
+const displayedModels = computed(() => {
+  let list = store.models.slice()
+  if (selectedBrand.value) {
+    list = list.filter((m) => m.brandId === selectedBrand.value)
+  }
+
+  const dir = sortDir.value === 'asc' ? 1 : -1
+  list.sort((a, b) => {
+    if (sortBy.value === 'price') return (a.minPrice - b.minPrice) * dir
+    if (sortBy.value === 'year') return (a.yearFrom - b.yearFrom) * dir
+    return a.name.localeCompare(b.name) * dir
+  })
+
+  return list
+})
 
 function getImageUrl(model: CarModelResponse) {
   return ImageHelper.getPhotoUrl(model.images, PHOTO_KEYS.PHOTO_MD) || ''
@@ -87,9 +118,31 @@ function formatPrice(value: number) {
           Модели не найдены.
         </div>
 
-        <div v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div v-if="store.models.length" class="mb-4 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-slate-600">Фильтр:</label>
+            <select v-model="selectedBrand" class="rounded-full border px-3 py-2 text-sm">
+              <option :value="null">Все бренды</option>
+              <option v-for="b in brands" :key="b.id" :value="b.id">{{ b.name }}</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-slate-600">Сортировать:</label>
+            <select v-model="sortBy" class="rounded-full border px-3 py-2 text-sm">
+              <option value="price">По цене</option>
+              <option value="year">По году</option>
+              <option value="name">По названию</option>
+            </select>
+            <button @click="sortDir = sortDir === 'asc' ? 'desc' : 'asc'" class="rounded-full border px-3 py-2 text-sm">
+              {{ sortDir === 'asc' ? '↑' : '↓' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <article
-            v-for="model in store.models"
+            v-for="model in displayedModels"
             :key="model.id"
             class="group overflow-hidden rounded-4xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >

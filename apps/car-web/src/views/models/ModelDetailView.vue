@@ -5,6 +5,8 @@ import { PHOTO_KEYS } from '@car/common'
 import { useModelStore } from '@/stores/model.store'
 import { useConfigurationStore } from '@/stores/configuration.store'
 import { ImageHelper } from '@/utils/image.utils'
+import { fetchBrands } from '@/services/brand.service'
+import type { BrandResponse } from '@car/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,6 +15,7 @@ const modelStore = useModelStore()
 const configurationStore = useConfigurationStore()
 const model = computed(() => modelStore.selectedModel)
 const configurations = computed(() => configurationStore.configurations)
+const brand = ref<BrandResponse | null>(null)
 const photos = computed(() => ImageHelper.getPhotoArray(model.value?.images, PHOTO_KEYS.PHOTO_MD))
 const activePhotoIndex = ref(0)
 const activePhotoUrl = computed(() => ImageHelper.generatePublicUrl(photos.value[activePhotoIndex.value]) || '')
@@ -42,6 +45,15 @@ async function loadDetails() {
       modelStore.fetchOne(modelId),
       configurationStore.fetchByModelId(modelId),
     ])
+    // load brand for the model (if available)
+    try {
+      if (model.value?.brandId) {
+        const brands = await fetchBrands()
+        brand.value = brands.find((b) => b.id === model.value!.brandId) || null
+      }
+    } catch (err) {
+      // non-fatal - brand is optional for display
+    }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     error.value = 'Не удалось загрузить данные модели. Возможно, модель не найдена.'
@@ -124,7 +136,7 @@ onMounted(loadDetails)
 
             <div class="space-y-6">
               <div>
-                <p class="text-sm uppercase tracking-[0.24em] text-slate-500">{{ model.name }}</p>
+                <p class="text-sm uppercase tracking-[0.24em] text-slate-500">{{ brand ? brand.name : model.name }}</p>
                 <h1 class="mt-3 text-4xl font-semibold text-slate-900">{{ model.name }}</h1>
                 <p class="mt-4 text-slate-600">Класс {{ model.carClass }}, кузов {{ model.bodyType }}, привод {{ model.driveType }}.</p>
               </div>
